@@ -1,23 +1,21 @@
-import { setConfig, getConfig, MyEnvConfig, getConfigVariable } from './config/config';
-import 'reflect-metadata';
-import { DataSource } from 'typeorm';
+import { setConfig, MyEnvConfig, getConfigVariable } from './config/config';
 
-import 'reflect-metadata'; // Required by TypeORM
 import express from 'express';
-import http, { get } from 'http';
+import http from 'http';
 import path from 'path';
+import cookieParser from 'cookie-parser';
+import cors from 'cors'; 
+import { authMiddleware } from './auth/authMiddleware';
 
 import { Server } from 'socket.io';
+import { setupSocket } from './socket'; 
+import router from './router'; 
 
 import { AppDataSource } from './config/dataSource';
-import { initializeData } from './config/initializeData';
-import router from './router';         // Importing our modularized routes
-import { setupSocket } from './socket'; // Importing our Socket.IO event handler
-import cookieParser from 'cookie-parser';
+import { DataSource } from 'typeorm';
+import 'reflect-metadata';
 
 
-import cors from 'cors'; // import cors middleware
-import { authMiddleware } from './auth/authMiddleware';
 
 let server: http.Server | null = null;
 let dataSource: DataSource | null = null;
