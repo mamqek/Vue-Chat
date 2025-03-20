@@ -1,3 +1,91 @@
+
+# Start
+
+## Config 
+
+In development you might use localhost:4000, but in production, you’d set SERVICE_URL to something like https://website.com (if using a reverse proxy) or https://website.com:4000 (if exposing the port directly).
+
+setConfig({
+  User: {
+    entity: MyCustomUser, // Or omit if they are only changing the mapping on the default entity.
+    field_mapping: {
+      full_name: 'username', // Map the expected full_name to their "username" column.
+      avatar: 'avatar',      // Keep as is if names match.
+      bio: 'bio',            // Keep as is.
+    }
+  }
+});
+
+
+## User data
+
+Chat service connects to the database of your project and retrieves required for chat user information (also see in User entity service\src\entities\User.ts)
+- full_name (user name to be displayed)
+- avatar (path to users profile picture)
+- bio (~1 sentence of user description)
+
+To do so, chat service requires id of the user which uses the chat. 
+There are several ways to pass it: 
+
+
+
+### Pass as attribute to web component
+
+You can pass user-id as attribute to the component
+
+<chat-widget 
+    user-id="2"
+</chat-widget>
+
+Just like that web component will retrieve user information from connected DB. 
+Package authenticates requests to service via JWT. It is advised to change config attributes from default values: 
+- TOKEN_SECRET - your secret which is used for encoding
+- JWT_ALGORITHM - algorithm used for encoding (default is HS256), not really necessary to change
+
+### Pass requests through your authenticated route 
+
+You can setup an authenticated route like "chat/*". It will receive all requests from web component and pass them to chat service. This approach counts on that your route will provide user object in the body of request when passing it. It will also omit service's authentication as it counts on your backend handling it. 
+
+You need to set these properties in config:
+
+- HOST - set it to '127.0.0.1' to only allow requests from the same machine (if your backed and chat service are run on the same server)
+- SERVICE_URL - set it to url of your project + route you have set up f.e your project url is "https://website.com" and route is "chat/*", then set it to "https://website.com/chat"
+
+
+### Connect service to your authentication system
+
+Many frameworks store user information in session or cookies to access authenticated user in easy manner. You can choose method your project uses and configure service so it extracts user info from the same source.
+
+#### JWT 
+if your project uses JWT for authentication, from which user_id can be extracted. Package supports when this token is HttpOnly Cookie or if its stored in localStorage on the client. For now package doesnt support encryption (JWE) or Paseto. 
+
+You need to set these properties in config:
+
+- TOKEN_NAME - how your cookie is named or its attribute name in localStorage
+- TOKEN_SECRET - your secret which is used for encoding
+- JWT_ALGORITHM - algorithm used for encoding (default is HS256)
+
+#### Session based authentication
+If your project uses session based authentication, if you use f.e Laravel, Ruby on Rails, Django, Express, ASP.NET Core
+
+You need to set these properties in config:
+
+- TOKEN_NAME - how your cookie is named or its attribute name in localStorage
+- sessionLookup - provide function which validates token and returns object with property id which is id of the authenticated user. Usually in such systems user info is retrieved by accession session table in database, depends on framework or your custom implementation
+
+If the token used by session based autentication is also JWT, this approach can be used together with JWT approach with assumption that "id" property of JWT holds session token.
+
+TODO: provide an example for laravel 
+
+
+
+
+
+
+
+
+
+
 # vue-chat
 
   "scripts": {
@@ -108,86 +196,5 @@ const dataSourceOptions = {
 
 
 
-
-
-# Start
-
-## Secure 
-
-## Config 
-
-In development you might use localhost:4000, but in production, you’d set SERVICE_URL to something like https://website.com (if using a reverse proxy) or https://website.com:4000 (if exposing the port directly).
-
-setConfig({
-  User: {
-    entity: MyCustomUser, // Or omit if they are only changing the mapping on the default entity.
-    field_mapping: {
-      full_name: 'username', // Map the expected full_name to their "username" column.
-      avatar: 'avatar',      // Keep as is if names match.
-      bio: 'bio',            // Keep as is.
-    }
-  }
-});
-
-
-## User data
-
-Chat service connects to the database of your project and retrieves required for chat user information (also see in User entity service\src\entities\User.ts)
-- full_name (user name to be displayed)
-- avatar (path to users profile picture)
-- bio (~1 sentence of user description)
-
-To do so, chat service requires id of the user which uses the chat. 
-There are several ways to pass it: 
-
-
-
-### Pass as attribute to web component
-
-You can pass user-id as attribute to the component
-
-<chat-widget 
-    user-id="2"
-</chat-widget>
-
-Just like that web component will retrieve user information from connected DB. 
-Package authenticates requests to service via JWT. It is advised to change config attributes from default values: 
-- TOKEN_SECRET - your secret which is used for encoding
-- JWT_ALGORITHM - algorithm used for encoding (default is HS256), not really necessary to change
-
-### Pass requests through your authenticated route 
-
-You can setup an authenticated route like "chat/*". It will receive all requests from web component and pass them to chat service. This approach counts on that your route will provide user object in the body of request when passing it. It will also omit service's authentication as it counts on your backend handling it. 
-
-You need to set these properties in config:
-
-- HOST - set it to '127.0.0.1' to only allow requests from the same machine (if your backed and chat service are run on the same server)
-- SERVICE_URL - set it to url of your project + route you have set up f.e your project url is "https://website.com" and route is "chat/*", then set it to "https://website.com/chat"
-
-
-### Connect service to your authentication system
-
-Many frameworks store user information in session or cookies to access authenticated user in easy manner. You can choose method your project uses and configure service so it extracts user info from the same source.
-
-#### JWT 
-if your project uses JWT for authentication, from which user_id can be extracted. Package supports when this token is HttpOnly Cookie or if its stored in localStorage on the client. For now package doesnt support encryption (JWE) or Paseto. 
-
-You need to set these properties in config:
-
-- TOKEN_NAME - how your cookie is named or its attribute name in localStorage
-- TOKEN_SECRET - your secret which is used for encoding
-- JWT_ALGORITHM - algorithm used for encoding (default is HS256)
-
-#### Session based authentication
-If your project uses session based authentication, if you use f.e Laravel, Ruby on Rails, Django, Express, ASP.NET Core
-
-You need to set these properties in config:
-
-- TOKEN_NAME - how your cookie is named or its attribute name in localStorage
-- sessionLookup - provide function which validates token and returns object with property id which is id of the authenticated user. Usually in such systems user info is retrieved by accession session table in database, depends on framework or your custom implementation
-
-If the token used by session based autentication is also JWT, this approach can be used together with JWT approach with assumption that "id" property of JWT holds session token.
-
-TODO: provide an example for laravel 
 
 
