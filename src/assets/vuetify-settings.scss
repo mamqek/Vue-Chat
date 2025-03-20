@@ -1,0 +1,7 @@
+// @use 'vuetify/settings' with (
+//   $color-pack: false,
+//   $utilities: false,
+// );
+@use 'vuetify' with (
+    $reset: false   
+);

@@ -1,0 +1,83 @@
+
+
+/* ... */
+
+@layer base {
+    :root {
+        --shadcn-background: 0 0% 100%; /* White background */
+        --shadcn-foreground: 174 73% 4%; /* Dark teal text */
+    
+        --shadcn-card: 0 0% 100%; /* White card background */
+        --shadcn-card-foreground: 174 73% 4%; /* Dark teal text */
+    
+        --shadcn-popover: 0 0% 100%; /* White popover background */
+        --shadcn-popover-foreground: 174 73% 4%; /* Dark teal text */
+    
+        --shadcn-primary: 176 71% 49%; /* Teal primary color */
+        --shadcn-primary-foreground: 0 0% 100%; /* White text on primary */
+    
+        --shadcn-secondary: 174 20% 90%; /* Light teal secondary color */
+        --shadcn-secondary-foreground: 174 73% 20%; /* Darker teal text */
+    
+        --shadcn-muted: 174 20% 90%; /* Light teal muted color */
+        --shadcn-muted-foreground: 174 8% 46%; /* Medium teal text */
+    
+        --shadcn-accent: 176 70% 90%; /* Light teal accent color */
+        --shadcn-accent-foreground: 176 73% 60%; /* Darker teal text */
+    
+        --shadcn-destructive: 0 84% 60%; /* Red destructive color */
+        --shadcn-destructive-foreground: 0 0% 100%; /* White text on destructive */
+    
+        /* --shadcn-border: 174 13% 50%; Very light teal border */
+        --shadcn-border: 0, 0%, 70.5%;
+        --shadcn-input: 174 13% 91%; /* Very light teal input background */
+        --shadcn-ring: 174 73% 50%; /* Teal ring color */
+        --shadcn-radius: 1rem; /* Border radius */
+    }
+  
+    .dark {
+        --shadcn-background: 174 73% 4%; /* Dark teal background */
+        --shadcn-foreground: 0 0% 100%; /* White text */
+    
+        --shadcn-card: 174 73% 4%; /* Dark teal card background */
+        --shadcn-card-foreground: 0 0% 100%; /* White text */
+    
+        --shadcn-popover: 174 73% 4%; /* Dark teal popover background */
+        --shadcn-popover-foreground: 0 0% 100%; /* White text */
+    
+        --shadcn-primary: 174 73% 50%; /* Teal primary color */
+        --shadcn-primary-foreground: 0 0% 100%; /* White text on primary */
+    
+        --shadcn-secondary: 174 20% 20%; /* Dark teal secondary color */
+        --shadcn-secondary-foreground: 0 0% 100%; /* White text */
+    
+        --shadcn-muted: 174 20% 20%; /* Dark teal muted color */
+        --shadcn-muted-foreground: 174 10% 65%; /* Medium teal text */
+    
+        --shadcn-accent: 174 20% 20%; /* Dark teal accent color */
+        --shadcn-accent-foreground: 0 0% 100%; /* White text */
+    
+        --shadcn-destructive: 0 63% 31%; /* Dark red destructive color */
+        --shadcn-destructive-foreground: 0 0% 100%; /* White text on destructive */
+    
+        --shadcn-border: 174 20% 20%; /* Dark teal border */
+        --shadcn-input: 174 20% 20%; /* Dark teal input background */
+        --shadcn-ring: 174 73% 50%; /* Teal ring color */
+    }
+}
+  
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+  
+@layer base {
+    body {
+        @apply tw-bg-background tw-text-foreground;
+    }
+    
+}
+
+.v-card {
+    @apply tw-rounded-lg !important;
+}
+
