@@ -2,26 +2,24 @@
     "name": "vue-chat",
     "version": "0.0.0",
     "private": true,
-    "main": "index.js",
+    "type": "module",
     "exports": {
         "./service": {
-            "require": "./index.js",
-            "import": "./index.mjs"
-        }, 
-        "." : {
-            "require": "./src/chat-widget.umd.js",
-            "import": "./src/chat-widget.mjs"
+            "require": "./dist/index.js",
+            "import": "./dist/index.mjs"
+        },
+        ".": {
+            "require": "./src/dist/chat-widget.umd.js",
+            "import": "./src/dist/chat-widget.mjs"
         }
     },
     "scripts": {
         "start": "node service/dist/index.js",
-
-        "dev:service": "npx ts-node-dev --project service/tsconfig.json --respawn --transpile-only service/src/index.ts",
+        "dev:service": "npx tsx --esm --project service/tsconfig.json --respawn --transpile-only service/src/index.ts",
         "dev:web": "vite",
         "dev": "concurrently \"npm:dev:service\" \"npm:dev:web\"",
-        
         "build:service": "tsc --project service/tsconfig.json",
-        "build:web": "vite build",
+        "build:web": "vite build --mode production",
         "build:main": "tsup index.js --format cjs,esm --dts",
         "build": "npm run build:service && npm run build:web && npm run build:main"
     },
@@ -30,6 +28,7 @@
         "axios": "^1.8.1",
         "class-variance-authority": "^0.7.1",
         "clsx": "^2.1.1",
+        "cssnano": "^7.0.6",
         "lucide-vue-next": "^0.477.0",
         "pinia": "^3.0.1",
         "reka-ui": "^2.0.2",
@@ -44,6 +43,7 @@
         "@vitejs/plugin-vue": "^5.2.1",
         "autoprefixer": "^10.4.20",
         "concurrently": "^9.1.2",
+        "rollup-plugin-visualizer": "^5.14.0",
         "sass-embedded": "^1.85.1",
         "tailwindcss": "^3.4.17",
         "ts-node-dev": "^2.0.0",

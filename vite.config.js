@@ -6,26 +6,35 @@ import vueDevTools from 'vite-plugin-vue-devtools'
 
 import tailwind from 'tailwindcss';
 import autoprefixer from 'autoprefixer';
+import cssnano from 'cssnano';
+// import purgecss from '@fullhuman/postcss-purgecss';
 
 import vuetify from 'vite-plugin-vuetify'
 
+import { visualizer } from 'rollup-plugin-visualizer'
+
 
 // https://vite.dev/config/
-export default defineConfig({
+export default defineConfig(({ command }) => ({
     build: {
         lib: {
-            entry: 'components/ChatWidget.ts',
+            entry: 'components/ChatWidget.js',
             name: 'ChatWidget',
             fileName: 'chat-widget',
-            formats: ["es", "umd"],  // For both ES Module and UMD
+            formats: ["es", "umd"],
         },
         rollupOptions: {
-            external: ["vue", "service"],
+            external: ["vue", "service", "@vue/devtools-api"], // Dont include these into build output
             output: {
+                // As they are not included, we need to provide a global name for UMD build
                 globals: {
-                    vue: "Vue",  // Make sure Vue is available globally in UMD builds
+                    vue: "Vue",
+                    '@vue/devtools-api': 'DevtoolsApi'
                 },
             },
+            plugins: [
+                visualizer({ filename: 'stats.html' })
+            ]
         },
     },
     plugins: [
@@ -33,7 +42,7 @@ export default defineConfig({
         vueDevTools(),
         vuetify({ 
             autoImport: true,       // Enabled by default
-            styles: { configFile: 'assets/vuetify-settings.scss' }
+            styles: { configFile: 'assets/vuetify-settings.scss'}
         }),
     ],
     root: path.resolve(__dirname, 'src'),
@@ -46,7 +55,40 @@ export default defineConfig({
     },
     css: {
         postcss: {
-            plugins: [tailwind(), autoprefixer()],
+            plugins: [
+                tailwind(), 
+                autoprefixer(),
+                // Replace :root with :host in each selector, so css works inside shadow DOM.
+                // Only for build command, as it is not needed in dev mode (no shadow dom)
+                ...(command === 'build'
+                    ? 
+                    [
+                        {
+                            postcssPlugin: 'replace-root-with-host',
+                            Once(root) {
+                                root.walkRules(rule => {
+                                    rule.selector = rule.selector.replace(/:root/g, ':host');
+                                });
+                            }
+                        },
+                    ]
+                    : 
+                    []
+                ),
+                // Purge which doesn't work because of vuetify
+                // purgecss({
+                //     content: [
+                //         './index.html',
+                //         './src/**/*.{js,jsx,ts,tsx,vue}', // Adjust paths to match your project structure.
+                //     ],
+                //     defaultExtractor: (content) => content.match(/[\w-/:]+(?<!:)/g) || [],
+                //     // Adjust safelist as needed to keep any selectors that are dynamically generated.
+                //     safelist: ['host', 'dynamic-class'],
+                // }),
+                cssnano({
+                    preset: 'default',
+                }),
+            ],
         },
     },
-})
+}))
