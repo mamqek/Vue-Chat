@@ -2,6 +2,13 @@
 
 /* ... */
 
+@use 'vuetify' with (
+    $reset: false,
+    $color-pack: false,
+    $utilities: false,
+);
+
+
 @layer base {
     :root {
         --shadcn-background: 0 0% 100%; /* White background */
@@ -80,4 +87,5 @@
 .v-card {
     @apply tw-rounded-lg !important;
 }
+
 
