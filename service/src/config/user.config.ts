@@ -1,5 +1,5 @@
 // src/config/user.config.ts
-import { User } from '../entities/User';
+import { BaseUser } from '../entities/BaseUser';
 
 export interface UserFieldMapping {
     full_name?: string; 
@@ -8,16 +8,14 @@ export interface UserFieldMapping {
 }   
 
 export interface UserConfig {
-    // The entity class that TypeORM should use.
-    // This can be the default or an override provided by the developer.
-    user_entity: Function;
-    // Field mapping for normalizing data from the user entity.
+    // Now a function returning the entity class dynamically
+    user_entity: () => new (...args: any[]) => BaseUser;
     field_mapping: UserFieldMapping;
 }
 
-
+// Default user config now dynamically resolves User
 export const defaultUserConfig: UserConfig = {
-    user_entity: User,
+    user_entity: () => require('../entities/User').User,  // Dynamic import
     field_mapping: {
         full_name: 'full_name',
         avatar: 'avatar',
