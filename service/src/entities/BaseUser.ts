@@ -25,9 +25,31 @@ export abstract class BaseUser {
         const avatarKey: string = mapping.avatar ?? defaultUserConfig.field_mapping.avatar!;
         const bioKey: string = mapping.bio ?? defaultUserConfig.field_mapping.bio!;
         
-        // Directly override the main fields with normalized values.
-        this.full_name = (this as any)[fullNameKey];
-        this.avatar    = (this as any)[avatarKey];
-        this.bio       = (this as any)[bioKey];
+        // Retrieve the values using the resolved keys.
+        const fullNameValue = (this as any)[fullNameKey];
+        const avatarValue   = (this as any)[avatarKey];
+        const bioValue      = (this as any)[bioKey];
+
+        // Check that each value is of the expected type (string).
+        if (typeof fullNameValue !== 'string') {
+            console.error(
+            `Type mismatch for ${fullNameKey}: expected a string, but got ${typeof fullNameValue}.`
+            );
+        }
+        if (typeof avatarValue !== 'string') {
+            console.error(
+            `Type mismatch for ${avatarKey}: expected a string, but got ${typeof avatarValue}.`
+            );
+        }
+        if (typeof bioValue !== 'string') {
+            console.error(
+            `Type mismatch for ${bioKey}: expected a string, but got ${typeof bioValue}.`
+            );
+        }
+
+        // Assign to internal properties if the types are correct (or you could choose to throw errors).
+        this.full_name = fullNameValue;
+        this.avatar    = avatarValue;
+        this.bio       = bioValue;
     }
 }
