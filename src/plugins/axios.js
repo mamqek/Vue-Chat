@@ -1,13 +1,14 @@
 import axioss from "axios";
-import { getConfigVariable } from "../../service/src/config/config";
+import { getCommonConfig } from "../../config/config.common.js";
 
 // import { notify } from "@kyvg/vue3-notification";
 
+let config = getCommonConfig();
 
 axioss.defaults.xsrfCookieName = 'csrftoken'
 
 const axiosInstance  = axioss.create({
-    baseURL: getConfigVariable('SERVICE_URL'),
+    baseURL: config.SERVICE_URL,
     timeout: 15000,
     withCredentials: true,
     headers: {
@@ -17,7 +18,7 @@ const axiosInstance  = axioss.create({
 
 // Axios interceptor to automatically attach JWT token from localStorage
 axiosInstance.interceptors.request.use(config => {
-    const token = localStorage.getItem(getConfigVariable('TOKEN_NAME'));
+    const token = localStorage.getItem( config.TOKEN_NAME);
     if (token) {
         config.headers['Authorization'] = `Bearer ${token}`;
     }

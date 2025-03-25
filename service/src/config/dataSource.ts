@@ -5,7 +5,7 @@ import { ChatMessage } from '../entities/ChatMessage';
 import { ChatMessageStatus } from '../entities/ChatMessageStatus';
 import { User } from '../entities/User';
 import path from 'path';
-import { getConfig } from './config';
+import { getConfig } from './config.server';
 
 const config = getConfig();
 // Determine the database type from an environment variable,

@@ -1,4 +1,6 @@
 import { defaultUserConfig, UserConfig } from './user.config';
+import { getCommonConfig, setCommonConfig } from "../../../config/config.common";
+
 
 export type SessionLookupFn = (sessionId: string) => Promise<any>;
 
@@ -20,7 +22,9 @@ export interface MyEnvConfig {
      * SERVICE_URL: The external URL for your service (e.g., "https://website.com").
      * Used for generating absolute links and configuring CORS.
      */
-    SERVICE_URL: string;                    
+    SERVICE_URL: string;     
+    
+    CORS_ORIGIN?: Array<string>;                   // The URL to allow CORS requests from
     
     UPLOAD_DIR?: string;
     user_filter?: string | Record<string, any>; // f.e '{"active": true, "role": "admin"}' as sting or { active: true, role: 'admin' } as object
@@ -50,6 +54,8 @@ const defaultConfig: MyEnvConfig = {
     SERVICE_URL: "http://localhost:4000",
     UPLOAD_DIR: "uploads",
 
+    CORS_ORIGIN: ['http://localhost:5174', 'http://localhost:5173'],
+
     user_filter: {},
 
     DB_TYPE: "sqlite",
@@ -74,6 +80,7 @@ const defaultConfig: MyEnvConfig = {
 let currentConfig: MyEnvConfig = { ...defaultConfig };
 
 export function setConfig(newConfig: Partial<MyEnvConfig>) {
+    setCommonConfig(newConfig);
   // Merge the new config into the defaults.
   currentConfig = { ...defaultConfig, ...newConfig };
 //   validateConfig(currentConfig);

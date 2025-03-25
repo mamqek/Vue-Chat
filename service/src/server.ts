@@ -1,4 +1,4 @@
-import { setConfig, MyEnvConfig, getConfigVariable } from './config/config';
+import { setConfig, MyEnvConfig, getConfigVariable } from './config/config.server';
 
 import express from 'express';
 import http from 'http';
@@ -46,7 +46,7 @@ export async function startService(userConfig?: Partial<MyEnvConfig>) {
         app.use(express.urlencoded({ extended: true }));
         // CORS middleware. Adjust the origin as needed.
         const corsOptions = {
-            origin: 'http://localhost:5173',
+            origin: getConfigVariable('CORS_ORIGIN'),
             credentials: true,              
         };
         app.use(cors(corsOptions));

@@ -7,7 +7,7 @@ import { User } from './entities/User';
 import { broadcastToUser } from './socket';
 import { In, Not } from 'typeorm';
 import { getAuthUser } from './auth/context';
-import { getParsedConfigVariable, getConfigVariable } from './config/config';
+import { getParsedConfigVariable, getConfigVariable } from './config/config.server';
 // import NodeCache from 'node-cache';
 
 // const cache = new NodeCache();

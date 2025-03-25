@@ -6,7 +6,7 @@ import { broadcastToUser } from './socket';
 import jwt from 'jsonwebtoken';
 import { withContext } from './auth/context';
 import { AuthenticatedRequest } from './auth/authMiddleware';
-import { getConfigVariable } from './config/config';
+import { getConfigVariable } from './config/config.server';
 
 
 

@@ -2,7 +2,7 @@
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
-import { getConfigVariable } from './config';
+import { getConfigVariable } from './config.server';
 
 // TODO: alighn path passed to config with this to allow user to put uploads folder in their project instead of node_moduels
 const uploadDir = path.resolve(__dirname, `../../${getConfigVariable('UPLOAD_DIR')}`);

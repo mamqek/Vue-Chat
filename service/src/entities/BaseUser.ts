@@ -1,5 +1,5 @@
 import { AfterLoad } from 'typeorm';
-import { getConfig } from '../config/config'; 
+import { getConfig } from '../config/config.server'; 
 import { defaultUserConfig, UserFieldMapping } from '../config/user.config';
 
 

@@ -2,7 +2,7 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt, { Algorithm } from 'jsonwebtoken';
 import { asyncLocalStorage } from './context';
-import { getConfigVariable } from '../config/config';
+import { getConfigVariable } from '../config/config.server';
 
 
 export interface AuthenticatedRequest extends Request {

@@ -1,4 +1,4 @@
-import { getConfig, setConfig } from './service/src/config/config';
+import { getConfig, setConfig } from './service/src/config/config.server';
 export { getConfig, setConfig };
 
 // Import and re-export service functions

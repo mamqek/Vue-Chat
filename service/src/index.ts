@@ -12,7 +12,7 @@ import { setupSocket } from './socket'; // Importing our Socket.IO event handler
 import cookieParser from 'cookie-parser';
 
 
-import { getConfigVariable } from './config/config';
+import { getConfigVariable } from './config/config.server';
 
 
 import cors from 'cors'; // import cors middleware
@@ -38,7 +38,7 @@ AppDataSource.initialize()
     app.use(express.urlencoded({ extended: true }));
     // CORS middleware. Adjust the origin as needed.
     const corsOptions = {
-        origin: 'http://localhost:5173',
+        origin: getConfigVariable('CORS_ORIGIN'),
         credentials: true,              
     };
     app.use(cors(corsOptions));
