@@ -1,6 +1,5 @@
 import { defaultUserConfig, UserConfig } from './user.config';
-import { getCommonConfig, setCommonConfig } from "../../../config/config.common";
-
+import { setCommonConfig } from '../../../config/config.common';
 
 export type SessionLookupFn = (sessionId: string) => Promise<any>;
 

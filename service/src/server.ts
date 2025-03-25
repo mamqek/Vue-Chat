@@ -1,3 +1,7 @@
+import 'reflect-metadata';
+import { AppDataSource } from './config/dataSource';
+import { DataSource } from 'typeorm';
+
 import { setConfig, MyEnvConfig, getConfigVariable } from './config/config.server';
 
 import express from 'express';
@@ -11,9 +15,6 @@ import { Server } from 'socket.io';
 import { setupSocket } from './socket'; 
 import router from './router'; 
 
-import { AppDataSource } from './config/dataSource';
-import { DataSource } from 'typeorm';
-import 'reflect-metadata';
 
 
 

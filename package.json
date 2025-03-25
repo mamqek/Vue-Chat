@@ -2,7 +2,6 @@
     "name": "vue-chat",
     "version": "0.0.0",
     "private": true,
-    "type": "module",
     "exports": {
         "./service": {
             "require": "./dist/exports.js",
@@ -15,13 +14,13 @@
     },
     "scripts": {
         "start": "node service/dist/index.js",
-        "dev:service": "npx tsx --esm --project service/tsconfig.json --respawn --transpile-only service/src/index.ts",
+        "dev:service": "npx ts-node-dev --project service/tsconfig.json --respawn --transpile-only service/src/index.ts",
         "dev:web": "vite",
         "dev": "concurrently \"npm:dev:service\" \"npm:dev:web\"",
-        "build:service": "tsc --project service/tsconfig.json",
+        "build:service": "cd service && npm run build",
         "build:web": "vite build --mode production",
-        "build": "npm run build:service && npm run build:web && npm run build:main"
         "build:main": "tsup exports.js --format cjs,esm --dts",
+        "build": "npm run build:service && npm run build:web && npm run build:main"
     },
     "dependencies": {
         "@tailwindcss/container-queries": "^0.1.1",

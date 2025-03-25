@@ -1,5 +1,6 @@
 import axioss from "axios";
-import { getCommonConfig } from "../../config/config.common.js";
+import { getCommonConfig } from "../../config/config.common.js"; // Use ESM syntax
+
 
 // import { notify } from "@kyvg/vue3-notification";
 
