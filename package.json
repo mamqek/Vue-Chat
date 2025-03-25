@@ -5,8 +5,8 @@
     "type": "module",
     "exports": {
         "./service": {
-            "require": "./dist/index.js",
-            "import": "./dist/index.mjs"
+            "require": "./dist/exports.js",
+            "import": "./dist/exports.mjs"
         },
         ".": {
             "require": "./src/dist/chat-widget.umd.js",
@@ -20,8 +20,8 @@
         "dev": "concurrently \"npm:dev:service\" \"npm:dev:web\"",
         "build:service": "tsc --project service/tsconfig.json",
         "build:web": "vite build --mode production",
-        "build:main": "tsup index.js --format cjs,esm --dts",
         "build": "npm run build:service && npm run build:web && npm run build:main"
+        "build:main": "tsup exports.js --format cjs,esm --dts",
     },
     "dependencies": {
         "@tailwindcss/container-queries": "^0.1.1",
