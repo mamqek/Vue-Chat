@@ -8,6 +8,9 @@ export { startService, stopService };
 import { initializeData } from './service/src/config/initializeData';
 export { initializeData };
 
+// import { BaseUser } from './service/src/entities/User';
+// export { BaseUser };
+
 // Import and re-export chatService and related functions/classes
 import chatService, { 
   setChatServiceInstance, 

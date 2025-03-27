@@ -10,21 +10,39 @@ import {
     JoinColumn,
     OneToOne
 } from 'typeorm';
-import { ChatMessage } from './ChatMessage';
-import { User } from './User';
+// import { User, BaseUser, getUserEntity } from './User';
+// import { User } from './User';
+import { BaseUserEntity } from './BasaUser';
 
+import { getMetadataArgsStorage } from 'typeorm';
+console.log('Debugging Chat Entity:');
+console.log('BaseUserEntity Metadata:', getMetadataArgsStorage().tables.find(table => table.target === BaseUserEntity));
+console.log('All Registered Entities:', getMetadataArgsStorage().tables.map(table => table.target));
+
+import { ChatMessage } from './ChatMessage';
+import { getConfig } from '../config/config.server';
+
+
+
+// console.log("caht class", User);
 @Entity({ name: 'chats' })
 export class Chat {
     @PrimaryGeneratedColumn()
     id!: number;
         
-    @ManyToOne(() => User, { eager: true, cascade: true })
+    @ManyToOne(() => {
+        const config = getConfig();
+        return config.User.user_entity;
+    }, { eager: true, cascade: true })
     @JoinColumn({ name: 'user1_id' })
-    user1!: User;
+    user1!: BaseUserEntity;
 
-    @ManyToOne(() => User, { eager: true, cascade: true })
+    @ManyToOne(() => {
+        const config = getConfig();
+        return config.User.user_entity;
+    }, { eager: true, cascade: true })
     @JoinColumn({ name: 'user2_id' })
-    user2!: User;
+    user2!: BaseUserEntity;
     
     @Column({ type: 'int', default: 0 })
     user1_unread_count: number = 0;

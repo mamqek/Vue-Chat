@@ -29,20 +29,22 @@ export interface MyEnvConfig {
     user_filter?: string | Record<string, any>; // f.e '{"active": true, "role": "admin"}' as sting or { active: true, role: 'admin' } as object
     
     // Database configuration
-    DB_TYPE: string;                       // E.g., 'sqlite', 'postgres', 'mysql'
+    DB_PATH: string;                       // Path to SQLite database file
+    DB_TYPE: 'sqlite' | 'mysql' | 'postgres';
     DB_NAME: string;                       // Database name or file name (for SQLite)
     DB_HOST?: string;                      // For non-SQLite DBs
     DB_PORT?: number;                      // For non-SQLite DBs
     DB_USER?: string;                      // For non-SQLite DBs
     DB_PASS?: string;                      // For non-SQLite DBs
     synchronize?: boolean;                 // Automatically create database schema
+    logging?: boolean | string[];          // Enable TypeORM logging
 
     TOKEN_NAME: string;
     TOKEN_SECRET: string;
     JWT_ALGORITHM?: string;
     sessionLookup: SessionLookupFn;
 
-    User?: UserConfig;
+    User: UserConfig;
 }
 
 // Define default values.
@@ -57,6 +59,7 @@ const defaultConfig: MyEnvConfig = {
 
     user_filter: {},
 
+    DB_PATH: '../service/chatdb.sqlite',
     DB_TYPE: "sqlite",
     DB_NAME: "chatdb",
     DB_HOST: "",          // Not used for SQLite; override for Postgres/MySQL
@@ -64,6 +67,7 @@ const defaultConfig: MyEnvConfig = {
     DB_USER: "",          // Not used for SQLite; override for Postgres/MySQL
     DB_PASS: "",          // Not used for SQLite; override for Postgres/MySQL
     synchronize: false,
+    logging: false,
 
     HOST: "0.0.0.0",
     TOKEN_NAME: "chat_token",
@@ -79,10 +83,17 @@ const defaultConfig: MyEnvConfig = {
 let currentConfig: MyEnvConfig = { ...defaultConfig };
 
 export function setConfig(newConfig: Partial<MyEnvConfig>) {
+    console.log(" setconfig")
     setCommonConfig(newConfig);
-  // Merge the new config into the defaults.
-  currentConfig = { ...defaultConfig, ...newConfig };
-//   validateConfig(currentConfig);
+    // Merge the new config into the defaults.
+    currentConfig = { ...defaultConfig, ...newConfig };
+    //   validateConfig(currentConfig);
+}
+
+export function setConfigVariable(key: string, value: any) {
+
+    currentConfig = { ...currentConfig, [key]: value };
+    //   validateConfig(currentConfig);
 }
 
 export function getConfig(): MyEnvConfig {
@@ -104,6 +115,10 @@ export function getParsedConfigVariable<K extends keyof MyEnvConfig>(variable: K
     }
   }
   return (value as Record<string, any>) || {};
+}
+
+export function isDefault<K extends keyof MyEnvConfig>(variable: K): boolean {
+    return currentConfig[variable] === defaultConfig[variable];
 }
 
 // // Validate required or mutually-exclusive configuration.

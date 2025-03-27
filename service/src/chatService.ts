@@ -3,12 +3,14 @@ import { AppDataSource } from './config/dataSource';
 import { Chat } from './entities/Chat';
 import { ChatMessage } from './entities/ChatMessage';
 import { ChatMessageStatus, ChatMessageStatusEnum } from './entities/ChatMessageStatus';
-import { User } from './entities/User';
+import { BaseUser } from './entities/User';
 import { broadcastToUser } from './socket';
 import { In, Not } from 'typeorm';
 import { getAuthUser } from './auth/context';
 import { getParsedConfigVariable, getConfigVariable } from './config/config.server';
+import { BaseUserEntity } from './entities/BasaUser';
 // import NodeCache from 'node-cache';
+
 
 // const cache = new NodeCache();
 
@@ -118,9 +120,10 @@ export class ChatService {
         });
 
         if (!chat) {
+            let User = getConfigVariable("User").user_entity;
             const userRepository = AppDataSource.getRepository(User);
-            const user1 : User | null = await userRepository.findOneBy({ id: authUserId });
-            const user2 : User | null = await userRepository.findOneBy({ id: receiverId });
+            const user1 : BaseUserEntity | null = await userRepository.findOneBy({ id: authUserId }) as BaseUserEntity | null;
+            const user2 : BaseUserEntity | null = await userRepository.findOneBy({ id: receiverId }) as BaseUserEntity | null;
 
             if (!user1 || !user2) {
                 throw new Error("One or both users not found");
@@ -254,15 +257,16 @@ export class ChatService {
      * Retrieves otherChatters (users who could be chatted with)  and checks if the authenticated user has a chat with them.
      * @returns An array of otherChatters with an extra property `has_chat`.
      */
-    async getOtherChatters(): Promise<User[]> {
+    async getOtherChatters(): Promise<BaseUserEntity[]> {
         const authUserId = getAuthUser().id;
 
+        let User = getConfigVariable("User").user_entity;
         const userRepository = AppDataSource.getRepository(User);
         // Use the provided filter if any; otherwise, get all users.
         const otherChatters = await userRepository.find({ where: {
             ...getParsedConfigVariable('user_filter'),
             id: Not(authUserId)
-        } });    
+        } }) as BaseUserEntity[];    
 
         const chatRepository = AppDataSource.getRepository(Chat);
         for (const chatter of otherChatters) {
