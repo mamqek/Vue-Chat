@@ -3,10 +3,9 @@ import { DataSource, DataSourceOptions } from 'typeorm';
 import { Chat } from '../entities/Chat';
 import { ChatMessage } from '../entities/ChatMessage';
 import { ChatMessageStatus } from '../entities/ChatMessageStatus';
-import { CustomUser } from '../entities/CustomUser';
 
 import path from 'path';
-import { getConfig, isDefault, setConfigVariable } from './config.server';
+import { getConfig, isDefault } from './config.server';
 
 import readline from 'readline';
 
@@ -22,10 +21,6 @@ export async function initDatasource() {
         : path.resolve(__dirname,'../../chatdb.sqlite') 
     : config.DB_NAME;
 
-
-    const UserEntity = config.User.user_entity;
-
-    console.log(UserEntity);
     // Configure connection options.
     // If using SQLite, the database file will be placed in the service directory.
     const dataSourceOptions = config.DB_TYPE === 'sqlite'
@@ -36,9 +31,7 @@ export async function initDatasource() {
                 Chat, 
                 ChatMessage, 
                 ChatMessageStatus, 
-                // UserEntity
-                // { name: 'User', target: UserEntity }, // Override the User entity
-                CustomUser
+                config.User.user_entity
             ],
             synchronize: config.synchronize,
             logging: config.logging,
@@ -54,12 +47,13 @@ export async function initDatasource() {
                 Chat, 
                 ChatMessage, 
                 ChatMessageStatus, 
-                { name: 'User', target: UserEntity }, // Override the User entity
+                config.User.user_entity
             ],
             synchronize: config.synchronize,
             logging: config.logging,
         } as DataSourceOptions;
-    console.log('Entities:', dataSourceOptions.entities);
+
+
     AppDataSource = new DataSource(dataSourceOptions);
 
     await AppDataSource.initialize();

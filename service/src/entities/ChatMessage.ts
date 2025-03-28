@@ -9,7 +9,6 @@ import {
   JoinColumn,
   OneToOne,
 } from 'typeorm';
-
 import { Chat } from './Chat';
 import { ChatMessageStatus } from './ChatMessageStatus';
 
