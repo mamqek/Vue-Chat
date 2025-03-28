@@ -1,4 +1,4 @@
-import { defaultUserConfig, UserConfig } from './user.config';
+import { UserConfig } from '../types/UserConfig';
 import { setCommonConfig } from '../../../config/config.common';
 
 export type SessionLookupFn = (sessionId: string) => Promise<any>;
@@ -77,7 +77,14 @@ const defaultConfig: MyEnvConfig = {
         throw new Error("sessionLookup function not implemented");
     },
 
-    User: defaultUserConfig,
+    User: {
+        user_entity: require('../entities/User').DefaultUser,
+        field_mapping: {
+            full_name: 'full_name',
+            avatar: 'avatar',
+            bio: 'bio',
+        }
+    }
 };
 
 let currentConfig: MyEnvConfig = { ...defaultConfig };
