@@ -1,14 +1,16 @@
 import {
   Entity,
   PrimaryGeneratedColumn,
-  Column,
-  CreateDateColumn,
-  UpdateDateColumn,
+  Column
 } from 'typeorm';
-import { BaseUserEntity } from './BasaUser';
+import { BaseUser } from './BaseUser';
 
-@Entity({ name: 'users' }) // Ensure the table name matches the database schema
-export class CustomUser extends BaseUserEntity {
+// Example of a custom user entity that extends the BaseUser class.
+// This class is used to demonstrate how to create a custom user entity
+// Because this class has columns of username and description instead of full_name and bio
+// It is necessary to provide a getter and setter for full_name and bio to support legacy backend code
+@Entity({ name: 'users' })
+export class CustomUser extends BaseUser {
     @PrimaryGeneratedColumn()
     id!: number;
 
@@ -21,7 +23,6 @@ export class CustomUser extends BaseUserEntity {
     @Column({ type: 'text' })
     description!: string;
 
-    // Getter to support legacy backend code that expects a numeric user1_id field.
     get full_name(): string {
         return this.username;
     }
@@ -30,12 +31,11 @@ export class CustomUser extends BaseUserEntity {
         this.username = value;
     }
     
-    // Getter to support legacy backend code that expects a numeric user1_id field.
     get bio(): string {
-        return this.username;
+        return this.description;
     }
 
     set bio(value: string) {
-        this.username = value;
+        this.description = value;
     }
 }
