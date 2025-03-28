@@ -8,23 +8,11 @@ import {
     OneToMany,
     ManyToOne,
     JoinColumn,
-    OneToOne
 } from 'typeorm';
-// import { User, BaseUser, getUserEntity } from './User';
-// import { User } from './User';
-import { BaseUserEntity } from './BasaUser';
-
-import { getMetadataArgsStorage } from 'typeorm';
-console.log('Debugging Chat Entity:');
-console.log('BaseUserEntity Metadata:', getMetadataArgsStorage().tables.find(table => table.target === BaseUserEntity));
-console.log('All Registered Entities:', getMetadataArgsStorage().tables.map(table => table.target));
-
+import { BaseUser } from './BaseUser';
 import { ChatMessage } from './ChatMessage';
 import { getConfig } from '../config/config.server';
 
-
-
-// console.log("caht class", User);
 @Entity({ name: 'chats' })
 export class Chat {
     @PrimaryGeneratedColumn()
@@ -35,14 +23,14 @@ export class Chat {
         return config.User.user_entity;
     }, { eager: true, cascade: true })
     @JoinColumn({ name: 'user1_id' })
-    user1!: BaseUserEntity;
+    user1!: BaseUser;
 
     @ManyToOne(() => {
         const config = getConfig();
         return config.User.user_entity;
     }, { eager: true, cascade: true })
     @JoinColumn({ name: 'user2_id' })
-    user2!: BaseUserEntity;
+    user2!: BaseUser;
     
     @Column({ type: 'int', default: 0 })
     user1_unread_count: number = 0;
@@ -64,7 +52,6 @@ export class Chat {
     // One chat has many messages.
     @OneToMany(() => ChatMessage, (message) => message.chat)
     messages!: ChatMessage[];
-
 
     // Getter to support legacy backend code that expects a numeric user1_id field.
     get user1_id(): number {
