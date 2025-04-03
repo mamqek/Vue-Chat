@@ -106,17 +106,19 @@ export function setConfig(newConfig: Partial<MyEnvConfig>) {
     validateConfig(newConfig);
     console.log("set config")
     setCommonConfig(newConfig);
-    // Merge the new config into the defaults.
+    mergeConfig(newConfig);
+}
+
+// Merge the new config into the defaults.
+function mergeConfig(newConfig: Partial<MyEnvConfig>) {
     currentConfig = { ...defaultConfig, ...newConfig };
-
-    // Check if a field mapping is provided
-    if (newConfig.User?.field_mapping) {
+    const customMapping = newConfig.User?.field_mapping;
+    // Merge field mapping with default if provided
+    if (customMapping) {
+        mergeFieldMapping(customMapping);
         console.log("Generating CustomUser entity based on field mapping...");
-        const fieldMapping = newConfig.User.field_mapping;
-
         // Dynamically generate the CustomUser entity
-        const CustomUser = generateCustomUserClass(fieldMapping);
-
+        const CustomUser = generateCustomUserClass(currentConfig.User.field_mapping);
         // Update the User entity in the configuration
         currentConfig.User.user_entity = CustomUser;
     } else {
