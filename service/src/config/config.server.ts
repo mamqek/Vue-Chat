@@ -1,6 +1,7 @@
 import { UserConfig } from '../types/UserConfig';
 import { setCommonConfig } from '../../../config/config.common';
 import { DefaultUser } from '../entities/DefaultUser';
+import { LoggerOptions } from 'typeorm';
 import { generateCustomUserClass } from './user.config';
 
 
@@ -40,7 +41,7 @@ export interface MyEnvConfig {
     DB_USER?: string;                      // For non-SQLite DBs
     DB_PASS?: string;                      // For non-SQLite DBs
     synchronize?: boolean;                 // Automatically create database schema
-    logging?: boolean | string[];          // Enable TypeORM logging
+    logging: false | LoggerOptions;          // Enable TypeORM logging
 
     TOKEN_NAME: string;
     TOKEN_SECRET: string;
