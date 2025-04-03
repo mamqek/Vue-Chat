@@ -159,9 +159,19 @@ export function isDefault<K extends keyof MyEnvConfig>(variable: K): boolean {
     return currentConfig[variable] === defaultConfig[variable];
 }
 
-// // Validate required or mutually-exclusive configuration.
-// function validateConfig(config: MyEnvConfig): void {
-//   // Example: For properties propX and propY, require exactly one to be provided.
+function mergeFieldMapping(customMapping: UserFieldMapping): void {
+    const defaultMapping = defaultConfig.User.field_mapping;
+    const mergedMapping: Partial<UserFieldMapping> = {};
+    
+    // For each key in the default mapping, use the custom mapping if provided,
+    // otherwise fallback to the default mapping.
+    (Object.keys(defaultMapping) as (keyof UserFieldMapping)[]).forEach(key => {
+        mergedMapping[key] = customMapping && customMapping[key] ? customMapping[key] : defaultMapping[key];
+    });
+    currentConfig.User.field_mapping = mergedMapping;
+    console.log("mergedMapping", mergedMapping);
+}
+
 // Validate required or mutually-exclusive configuration.
 function validateConfig(config: Partial<MyEnvConfig>): void {
 

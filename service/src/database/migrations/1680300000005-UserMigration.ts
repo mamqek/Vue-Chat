@@ -5,10 +5,9 @@ import {
     TableColumn,
     TableColumnOptions,
 } from "typeorm";
-import { getDefaultConfig, isDefault } from "../../config/config.server";
+import { isDefault, getConfigVariable, setConfig } from "../../config/config.server";
 import { promptUser } from "../dataSource";
 import { UserFieldMapping } from "../../types/UserConfig";
-
 
 
 export class UserMigration1680300000005 implements MigrationInterface {
@@ -118,24 +117,12 @@ export class UserMigration1680300000005 implements MigrationInterface {
     }
 
     buildUserTableColumns() : TableColumnOptions[] {
-        const defaultMapping: UserFieldMapping = getDefaultConfig().User.field_mapping;
-
-        const mappingString = process.env.USER_CONFIG;
-        let customMapping: any;
-        if (mappingString) {
-            try {
-                customMapping = JSON.parse(mappingString);
-                console.warn("Custom mapping provided. Using custom User entity.");
-
-            } catch (err) {
-                throw new Error("Invalid MAPPING JSON provided in environment variables.");
-            }
-        } else {
-            console.warn("No custom mapping provided. Using default User entity.");
+        // Even though config gets set by dataSourceRef right after command execution within runMigration(), its not present within this migration.
+        // So we need to set it again here. 
+        const ENVConfig = process.env.USER_CONFIG;
+        if (ENVConfig) {
+            setConfig(JSON.parse(ENVConfig));
         }
-
-        // const customMapping: UserFieldMapping | undefined = getConfigVariable("User").field_mapping;
-        
         
         if (!isDefault("User")) {
             console.warn("Custom mapping provided. Using custom User entity.");
@@ -143,18 +130,9 @@ export class UserMigration1680300000005 implements MigrationInterface {
             console.warn("No custom mapping provided. Using default User entity.");
         }
 
-        console.warn("Custom mapping provided in environment variables:", customMapping);
-        console.warn("User:", customMapping.User.field_mapping.full_name);
-        
-        customMapping = customMapping?.User?.field_mapping;
-        // For each key in the default mapping, use the custom mapping if provided,
-        // otherwise fallback to the default mapping.
-        const mergedMapping: Partial<UserFieldMapping> = {};
-        (Object.keys(defaultMapping) as (keyof UserFieldMapping)[]).forEach(key => {
-            mergedMapping[key] = customMapping && customMapping[key] ? customMapping[key] : defaultMapping[key];
-        });
+        const mapping: UserFieldMapping = getConfigVariable("User").field_mapping;
 
-        const columns: TableColumnOptions[] = Object.values(mergedMapping).map(column =>
+        const columns: TableColumnOptions[] = Object.values(mapping).map(column =>
             ({ ...column, type: "text" })
         );
 
