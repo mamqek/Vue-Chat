@@ -5,7 +5,7 @@ import {
     TableColumn,
     TableColumnOptions,
 } from "typeorm";
-import { getConfigVariable, getDefaultConfig, isDefault, setConfigVariable } from "../../config/config.server";
+import { getDefaultConfig, isDefault } from "../../config/config.server";
 import { promptUser } from "../dataSource";
 import { UserFieldMapping } from "../../types/UserConfig";
 
@@ -13,7 +13,6 @@ import { UserFieldMapping } from "../../types/UserConfig";
 
 export class UserMigration1680300000005 implements MigrationInterface {
     public async up(queryRunner: QueryRunner): Promise<void> {
-        console.log(getConfigVariable("PORT"))  
         const columns = this.buildUserTableColumns();
         
         console.warn("Looking for existing User table.");

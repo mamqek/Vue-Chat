@@ -5,8 +5,8 @@ import path from 'path';
 
 import { Server } from 'socket.io';
 
-import { AppDataSource } from './config/dataSource';
-import { initializeData } from './config/initializeData';
+import { AppDataSource } from './database/dataSource';
+import { initializeData } from './database/initializeData';
 import router from './router';         // Importing our modularized routes
 import { setupSocket } from './socket'; // Importing our Socket.IO event handler
 import cookieParser from 'cookie-parser';

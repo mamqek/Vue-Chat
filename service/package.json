@@ -6,7 +6,6 @@
     "scripts": {
         "start": "node dist/index.js",
         "dev": "ts-node src/index.ts",
-        "db:reset": "ts-node ./node_modules/typeorm/cli.js schema:drop -d ./src/dataSource.ts && ts-node ./node_modules/typeorm/cli.js schema:sync -d ./src/dataSource.ts",
         "build": "tsup src/server.ts --format cjs,esm --dts --out-dir dist"
     },
     "bin": {
@@ -27,9 +26,8 @@
         "multer": "^1.4.5-lts.1",
         "reflect-metadata": "^0.1.13",
         "socket.io": "^4.5.4",
-        "typeorm": "^0.3.12",
-        "sqlite3": "^5.1.7"
-
+        "sqlite3": "^5.1.7",
+        "typeorm": "^0.3.12"
     },
     "devDependencies": {
         "@types/cookie-parser": "^1.4.8",

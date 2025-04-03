@@ -1,5 +1,5 @@
 // src/chatService.ts
-import { AppDataSource } from './config/dataSource';
+import { AppDataSource } from './database/dataSource';
 import { Chat } from './entities/Chat';
 import { ChatMessage } from './entities/ChatMessage';
 import { ChatMessageStatus, ChatMessageStatusEnum } from './entities/ChatMessageStatus';

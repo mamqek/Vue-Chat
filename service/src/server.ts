@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import { initDatasource } from './config/dataSource';
+import { initDatasource } from './database/dataSource';
 import { DataSource } from 'typeorm';
 
 import { setConfig, MyEnvConfig, getConfigVariable, setConfigVariable} from './config/config.server';
@@ -28,16 +28,20 @@ export async function startService(userConfig?: Partial<MyEnvConfig>) {
     if (userConfig) {
         setConfig(userConfig);
 
-        setConfigVariable('User', 
-            { 
-                user_entity: CustomUser,
-                field_mapping: {
-                    full_name: "username",
-                    avatar: "avatar",      
-                    bio: "description",  
-                },
-            }
-        );
+        // setConfigVariable('User', 
+        //     { 
+        //         field_mapping: {
+        //             full_name: {
+        //                 name: "username",
+        //                 default: "'User'",
+        //             },
+        //             bio: {
+        //                 name: "description",
+        //                 isNullable: true,
+        //             },
+        //         },
+        //     }
+        // );
     }
 
     // 2. Stop any existing service (if you want a “hot restart” pattern)
