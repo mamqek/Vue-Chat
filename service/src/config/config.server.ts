@@ -3,7 +3,7 @@ import { setCommonConfig } from '../../../config/config.common';
 import { DefaultUser } from '../entities/DefaultUser';
 import { LoggerOptions } from 'typeorm';
 import { generateCustomUserClass } from './user.config';
-
+import { UserFieldMapping } from '../types/UserConfig';
 
 export type SessionLookupFn = (sessionId: string) => Promise<any>;
 
@@ -103,11 +103,11 @@ const defaultConfig: MyEnvConfig = {
 let currentConfig: MyEnvConfig = { ...defaultConfig };
 
 export function setConfig(newConfig: Partial<MyEnvConfig>) {
+    validateConfig(newConfig);
     console.log("set config")
     setCommonConfig(newConfig);
     // Merge the new config into the defaults.
     currentConfig = { ...defaultConfig, ...newConfig };
-    //   validateConfig(currentConfig);
 
     // Check if a field mapping is provided
     if (newConfig.User?.field_mapping) {
@@ -126,9 +126,8 @@ export function setConfig(newConfig: Partial<MyEnvConfig>) {
 }
 
 export function setConfigVariable(key: string, value: any) {
-
     currentConfig = { ...currentConfig, [key]: value };
-    //   validateConfig(currentConfig);
+    validateConfig(currentConfig);
 }
 
 export function getConfig(): MyEnvConfig {
@@ -163,6 +162,21 @@ export function isDefault<K extends keyof MyEnvConfig>(variable: K): boolean {
 // // Validate required or mutually-exclusive configuration.
 // function validateConfig(config: MyEnvConfig): void {
 //   // Example: For properties propX and propY, require exactly one to be provided.
+// Validate required or mutually-exclusive configuration.
+function validateConfig(config: Partial<MyEnvConfig>): void {
+
+    // Check if keys in field_mapping are valid
+    if (config.User?.field_mapping) {
+        const mapping = config.User.field_mapping;
+        const allowedKeys: (keyof UserFieldMapping)[] = ["full_name", "avatar", "bio"];
+        Object.keys(mapping).forEach(key => {
+            if (!allowedKeys.includes(key as keyof UserFieldMapping)) {
+                throw new Error(`Invalid key "${key}" found in field mapping. Allowed keys are: ${allowedKeys.join(", ")}`);
+            }
+        });
+    }
+
+  // Example: For properties propX and propY, require exactly one to be provided.
 //   const hasPropX = !!config.propX;
 //   const hasPropY = !!config.propY;
 //   if ((hasPropX && hasPropY) || (!hasPropX && !hasPropY)) {
@@ -170,4 +184,4 @@ export function isDefault<K extends keyof MyEnvConfig>(variable: K): boolean {
 //       'Configuration error: exactly one of "propX" or "propY" must be provided.'
 //     );
 //   }
-// }
+}
