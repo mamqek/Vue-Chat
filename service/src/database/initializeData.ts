@@ -1,7 +1,7 @@
 // service/src/initializeData.ts
 import { AppDataSource } from './dataSource';
 import { Chat } from '../entities/Chat';
-import { getConfigVariable } from './config.server';
+import { getConfigVariable } from '../config/config.server';
 import { BaseUser } from '../entities/BaseUser';
 
 export async function initializeData() {
