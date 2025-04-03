@@ -1,5 +1,8 @@
 import { UserConfig } from '../types/UserConfig';
 import { setCommonConfig } from '../../../config/config.common';
+import { DefaultUser } from '../entities/DefaultUser';
+import { generateCustomUserClass } from './user.config';
+
 
 export type SessionLookupFn = (sessionId: string) => Promise<any>;
 
@@ -78,23 +81,47 @@ const defaultConfig: MyEnvConfig = {
     },
 
     User: {
-        user_entity: require('../entities/User').DefaultUser,
+        user_entity: DefaultUser, 
         field_mapping: {
-            full_name: 'full_name',
-            avatar: 'avatar',
-            bio: 'bio',
-        }
+            full_name: {
+                name: "full_name",
+                default: "'User'",
+            },
+            avatar: {
+                name: "avatar",
+                default: "'https://example.com/default-avatar.png'",
+            },
+            bio: {
+                name: "bio",
+                isNullable: true,
+            },
+        },
     }
 };
 
 let currentConfig: MyEnvConfig = { ...defaultConfig };
 
 export function setConfig(newConfig: Partial<MyEnvConfig>) {
-    console.log(" setconfig")
+    console.log("set config")
     setCommonConfig(newConfig);
     // Merge the new config into the defaults.
     currentConfig = { ...defaultConfig, ...newConfig };
     //   validateConfig(currentConfig);
+
+    // Check if a field mapping is provided
+    if (newConfig.User?.field_mapping) {
+        console.log("Generating CustomUser entity based on field mapping...");
+        const fieldMapping = newConfig.User.field_mapping;
+
+        // Dynamically generate the CustomUser entity
+        const CustomUser = generateCustomUserClass(fieldMapping);
+
+        // Update the User entity in the configuration
+        currentConfig.User.user_entity = CustomUser;
+    } else {
+        // Use DefaultUser if no custom mapping is provided
+        currentConfig.User.user_entity = DefaultUser;
+    }
 }
 
 export function setConfigVariable(key: string, value: any) {
@@ -105,6 +132,10 @@ export function setConfigVariable(key: string, value: any) {
 
 export function getConfig(): MyEnvConfig {
   return currentConfig;
+}
+
+export function getDefaultConfig(): MyEnvConfig {
+  return defaultConfig;
 }
 
 export function getConfigVariable<K extends keyof MyEnvConfig>(variable: K): MyEnvConfig[K] {
