@@ -112,6 +112,8 @@ export class ChatMigration1680300000000 implements MigrationInterface {
                 onDelete: "SET NULL",
             }),
         );
+
+        console.log("Migration for Chat table completed successfully.");
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {

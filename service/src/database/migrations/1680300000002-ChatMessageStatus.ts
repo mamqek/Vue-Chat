@@ -51,6 +51,8 @@ export class ChatMessageStatusMigration1680300000002 implements MigrationInterfa
                 onDelete: "CASCADE",
             }),
         );
+
+        console.log("Migration for ChatMessageStatus table completed successfully.");
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {

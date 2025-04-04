@@ -103,6 +103,8 @@ export class ChatMessageMigration1680300000001 implements MigrationInterface {
                 onDelete: "CASCADE",
             }),
         );
+
+        console.log("Migration for ChatMessage table completed successfully.");
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {

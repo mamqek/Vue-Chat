@@ -81,6 +81,7 @@ export class UserMigration1680300000005 implements MigrationInterface {
 
         }
 
+        console.log("Migration for User table completed successfully.");
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {

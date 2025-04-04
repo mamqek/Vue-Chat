@@ -104,16 +104,35 @@ async function runMigrations(): Promise<void> {
         // Use spawn here as it might be interactive prompt 
         const child = spawn("npx.cmd", ["typeorm", "migration:run", "-d", dataSourcePath], {
             env: { ...process.env, USER_CONFIG },
-            stdio: "inherit",
+            stdio: ['inherit', 'pipe', 'pipe'], // Capture stdout and stderr
         });
+
+        let migrationsCompleted = 0;
+        child.stdout.on("data", (data) => {
+            if (data.toString().includes("Migration for")) {
+                console.log(data.toString()); // Log the output to the console
+                migrationsCompleted++;
+            }
+        });
+
+        child.stderr.on("data", (data) => {
+            console.error(data.toString());
+        });
+
         child.on("close", (code) => {
+
             if (code === 0) {
-                console.log("Migration run successfully.");
+                if (migrationsCompleted === 0) {
+                    console.log("All migrations are already up to date.");
+                } else {
+                    console.log(`${migrationsCompleted} migrations run successfully.`);
+                }
                 resolve();
             } else {
                 reject(new Error(`Migration process exited with code ${code}`));
             }
         });
+
         child.on("error", (error) => {
             console.error(`Error running migrations: ${error.message}`);
             reject(error);
