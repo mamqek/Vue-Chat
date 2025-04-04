@@ -1,6 +1,6 @@
 import { getMetadataArgsStorage } from 'typeorm';
 import { Entity, Column } from "typeorm";
-import { UserFieldMapping } from '../types/UserConfig';
+import { UserFieldMapping, ColumnOptions } from '../types/UserConfig';
 import { BaseUser } from '../entities/BaseUser';
 
 
@@ -49,7 +49,6 @@ export function addEntityMetadata(target: Function, tableName: string = 'users')
 }
 
 
-// TODO : allow providing default value or nullable to the field mapping
 export function generateCustomUserClass(
     fieldMapping: UserFieldMapping,
     tableName: string = "users"
@@ -60,9 +59,9 @@ export function generateCustomUserClass(
         constructor() {
             super();
             // Dynamically initialize fields based on the mapping
-            for (const actualField of Object.values(fieldMapping)) {
-                if (!(actualField in this)) {
-                    Object.defineProperty(this, actualField, {
+            for (const columnOptions of Object.values(fieldMapping) as ColumnOptions[]) {
+                if (!(columnOptions.name in this)) {
+                    Object.defineProperty(this, columnOptions.name, {
                         value: undefined, // Leave fields undefined
                         writable: true,
                         enumerable: true,
@@ -79,17 +78,21 @@ export function generateCustomUserClass(
     }
 
     // Dynamically define columns and getters/setters
-    for (const [abstractProperty, actualField] of Object.entries(fieldMapping)) {
+    for (const [columnName, columnOptions ] of Object.entries(fieldMapping) as [keyof UserFieldMapping, ColumnOptions][]) {
         // Define a TypeORM column for the actual field
-        Column({ type: "text", nullable: true })(CustomUser.prototype, actualField);
+        Column({ 
+            type: "text", 
+            nullable: columnOptions?.isNullable, 
+            default: columnOptions?.default 
+        })(CustomUser.prototype, columnOptions.name);
 
         // Define the getter and setter for the abstract property
-        Object.defineProperty(CustomUser.prototype, abstractProperty, {
+        Object.defineProperty(CustomUser.prototype, columnName, {
             get() {
-                return this[actualField];
+                return this[columnOptions.name];
             },
             set(value: any) {
-                this[actualField] = value;
+                this[columnOptions.name] = value;
             },
             enumerable: true,
             configurable: true,
