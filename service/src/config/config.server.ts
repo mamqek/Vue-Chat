@@ -63,7 +63,7 @@ const defaultConfig: MyEnvConfig = {
 
     user_filter: {},
 
-    DB_PATH: '../service/chatdb.sqlite',
+    DB_PATH: '../src/database/chatdb.sqlite',
     DB_TYPE: "sqlite",
     DB_NAME: "chatdb",
     DB_HOST: "",          // Not used for SQLite; override for Postgres/MySQL
@@ -72,7 +72,6 @@ const defaultConfig: MyEnvConfig = {
     DB_PASS: "",          // Not used for SQLite; override for Postgres/MySQL
     synchronize: false,
     logging: false,
-
     HOST: "0.0.0.0",
     TOKEN_NAME: "chat_token",
     TOKEN_SECRET: "chat-secret",

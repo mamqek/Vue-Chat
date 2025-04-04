@@ -6,7 +6,10 @@
     "scripts": {
         "start": "node dist/index.js",
         "dev": "ts-node src/index.ts",
-        "build": "tsup src/server.ts --format cjs,esm --dts --out-dir dist"
+        "build:exports": "tsup exports.js --format cjs,esm --dts",
+        "build:main": "tsup src/index.ts --format cjs,esm --dts --out-dir dist",
+        "build:migrations": "tsup src/database/migrationUtils.ts --format cjs,esm --dts --out-dir dist",
+        "build": "npm run build:exports && npm run build:main"
     },
     "bin": {
         "mini-server": "./dist/index.js"

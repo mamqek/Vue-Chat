@@ -4,8 +4,8 @@
     "private": true,
     "exports": {
         "./service": {
-            "require": "./dist/exports.js",
-            "import": "./dist/exports.mjs"
+            "require": "./service/dist/exports.js",
+            "import": "./service/dist/exports.mjs"
         },
         ".": {
             "require": "./src/dist/chat-widget.umd.js",
@@ -19,8 +19,7 @@
         "dev": "concurrently \"npm:dev:service\" \"npm:dev:web\"",
         "build:service": "cd service && npm run build",
         "build:web": "vite build --mode production",
-        "build:main": "tsup exports.js --format cjs,esm --dts",
-        "build": "npm run build:service && npm run build:web && npm run build:main"
+        "build": "npm run build:service && npm run build:web"
     },
     "dependencies": {
         "@tailwindcss/container-queries": "^0.1.1",

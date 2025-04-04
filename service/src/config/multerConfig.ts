@@ -4,7 +4,6 @@ import path from 'path';
 import fs from 'fs';
 import { getConfigVariable } from './config.server';
 
-// TODO: alighn path passed to config with this to allow user to put uploads folder in their project instead of node_moduels
 const uploadDir = path.resolve(__dirname, `../../${getConfigVariable('UPLOAD_DIR')}`);
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });

@@ -1,19 +1,13 @@
-import { exec } from "child_process";
 import path from "path";
-import { AppDataSource } from "./dataSource";
 import { getConfig } from "../config/config.server";
-import { spawn } from "child_process";
+import { spawn, exec } from "child_process";
 
 // Wrap the exec commands in a Promise so program waits for it to finish
+// TODO: add revert method to revert migrations
+// TODO: test with postgres and mysql
 
 export async function handleMigrations(): Promise<void> {
     try {
-        // Ensure the DataSource is initialized
-        if (!AppDataSource.isInitialized) {
-            console.log(`DataSource is not initialized, initializing now...`);
-            await AppDataSource.initialize();
-        }
-
         await buildMigrations();
         await buildDataSource();
         await runMigrations();
@@ -23,13 +17,13 @@ export async function handleMigrations(): Promise<void> {
 }
 
 async function buildMigrations(): Promise<void> {
-    const migrationsDir = path.resolve(__dirname,  `../service/src/database/migrations/*`);
-    const buildMigrationsDir = path.resolve(__dirname, "../service/dist/migrations");
+    const migrationsDir = path.resolve(__dirname,  `../src/database/migrations/*`);
+    const buildMigrationsDir = path.resolve(__dirname, "../dist/migrations");
 
     const command = `npx tsup ${migrationsDir} --format cjs,esm --dts --out-dir ${buildMigrationsDir}`;
 
     // Execute command in the directory of service so tsup is available
-    const serviceDir = path.resolve(__dirname, "../service/");
+    const serviceDir = path.resolve(__dirname, "../");
     return new Promise((resolve, reject) => {
         exec(command, { cwd: serviceDir }, (error, stdout, stderr) => {
             if (error) {
@@ -50,13 +44,13 @@ async function buildMigrations(): Promise<void> {
 
 async function buildDataSource(): Promise<void> {
     console.log(`Building datasource`);
-    const dataSourcePath = path.resolve(__dirname, "../service/src/database/dataSourceRef.ts");
-    const distDir = path.resolve(__dirname, "../service/dist");
+    const dataSourcePath = path.resolve(__dirname, "../src/database/dataSourceRef.ts");
+    const distDir = path.resolve(__dirname, "../dist");
 
     const command = `npx tsup ${dataSourcePath} --format cjs,esm --dts --out-dir ${distDir}`;
     
     // Execute command in the directory of service so tsup is available
-    const serviceDir = path.resolve(__dirname, "../service/");
+    const serviceDir = path.resolve(__dirname, "../");
     return new Promise((resolve, reject) => {
         exec(command, { cwd: serviceDir }, (error, stdout, stderr) => {
             if (error) {
@@ -77,7 +71,7 @@ async function buildDataSource(): Promise<void> {
 
 async function runMigrations(): Promise<void> {
     console.log("Running migrations...");
-    const dataSourcePath = path.resolve(__dirname, "../service/dist/dataSourceRef.js");
+    const dataSourcePath = path.resolve(__dirname, "../dist/dataSourceRef.js");
 
     // Add User_Config to ENV so spawned process has access to config developer provided (needed for User migration)
     const USER_CONFIG = JSON.stringify(getConfig());
@@ -101,4 +95,5 @@ async function runMigrations(): Promise<void> {
         });
     });
 }
+
 

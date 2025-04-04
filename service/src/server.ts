@@ -27,21 +27,6 @@ export async function startService(userConfig?: Partial<MyEnvConfig>) {
     // 1. Merge new config
     if (userConfig) {
         setConfig(userConfig);
-
-        // setConfigVariable('User', 
-        //     { 
-        //         field_mapping: {
-        //             full_name: {
-        //                 name: "username",
-        //                 default: "'User'",
-        //             },
-        //             bio: {
-        //                 name: "description",
-        //                 isNullable: true,
-        //             },
-        //         },
-        //     }
-        // );
     }
 
     // 2. Stop any existing service (if you want a “hot restart” pattern)
@@ -69,6 +54,7 @@ export async function startService(userConfig?: Partial<MyEnvConfig>) {
     
     app.use(cookieParser());
     app.use(authMiddleware);
+    //TODO: connect path to config variable
     // 3b. Serve static files from the /uploads directory
     app.use('/uploads', express.static(path.resolve(__dirname, '../uploads')));
     // authMiddleware is a custom middleware function that checks for a valid JWT in the Authorization header.
