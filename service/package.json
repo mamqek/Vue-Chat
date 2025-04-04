@@ -12,7 +12,8 @@
         "build": "npm run build:exports && npm run build:main"
     },
     "bin": {
-        "mini-server": "./dist/index.js"
+        "mini-server": "./dist/index.js",
+        "migrations": "./dist/migrationUtils.js"
     },
     "keywords": [],
     "author": "",

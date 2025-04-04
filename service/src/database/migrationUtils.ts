@@ -1,3 +1,28 @@
+#!/usr/bin/env node
+
+//EXPORT TO NPM COMMAND
+// Check if the file is being executed directly
+if (require.main === module) {
+    // Call the handleMigrations function
+
+    const args = process.argv.slice(2); // Get command-line arguments (excluding "node" and the script path)
+
+    if (args.includes("--run")) {
+        try {
+            runMigrations();
+        } catch (error) {
+            console.error("Migration running failed:", error);
+        }
+    } else {
+        // If the "--other" flag is passed, execute other logic
+        handleMigrations().catch((error) => {
+            console.error("Error during migration compilation process", error);
+            process.exit(1);
+        });
+
+    }
+}
+
 import path from "path";
 import { getConfig } from "../config/config.server";
 import { spawn, exec } from "child_process";
