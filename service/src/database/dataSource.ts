@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import { DataSource, DataSourceOptions } from 'typeorm';
+import { DataSource, DataSourceOptions, SimpleConsoleLogger } from 'typeorm';
 import { Chat } from '../entities/Chat';
 import { ChatMessage } from '../entities/ChatMessage';
 import { ChatMessageStatus } from '../entities/ChatMessageStatus';
@@ -35,8 +35,9 @@ export async function initDatasource() {
         synchronize: config.synchronize,
         dropSchema: false,
         migrations: [path.resolve(__dirname, '../dist/migrations/*.js')], 
-        logging: config.logging,
 
+        // use SimpleConsoleLogger for logging, as even with logging: false, normal one shows logs
+        logger: new SimpleConsoleLogger(config.logging as any),
         host: config.DB_HOST,
         port: config.DB_PORT,
         username: config.DB_USER,
@@ -44,7 +45,6 @@ export async function initDatasource() {
     };
 
     AppDataSource = new DataSource(dataSourceOptions);
-
     await AppDataSource.initialize();
     console.log('Data Source has been initialized!', database);
 
