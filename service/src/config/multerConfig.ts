@@ -4,7 +4,9 @@ import path from 'path';
 import fs from 'fs';
 import { getConfigVariable } from './config.server';
 
-const uploadDir = path.resolve(__dirname, `../../${getConfigVariable('UPLOAD_DIR')}`);
+const uploadDir = getConfigVariable('UPLOAD_DIR');
+console.log(`Upload directory: ${uploadDir}`);
+
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }

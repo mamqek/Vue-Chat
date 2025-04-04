@@ -14,14 +14,8 @@ export let AppDataSource: DataSource;
 export async function initDatasource() {
     const config = getConfig();
 
-    const database = config.DB_TYPE === 'sqlite' 
-    ? getConfig().production 
-        ? path.resolve(__dirname, config.DB_PATH)
-        : path.resolve(__dirname,'../../chatdb.sqlite') 
-    : config.DB_NAME;
+    const database = config.DB_TYPE === 'sqlite' ? config.DB_PATH : config.DB_NAME;
 
-    // Configure connection options.
-    // If using SQLite, the database file will be placed in the service directory.
     const dataSourceOptions: DataSourceOptions = 
     {
         type: config.DB_TYPE as 'sqlite' | 'postgres' | 'mysql',
@@ -46,7 +40,7 @@ export async function initDatasource() {
 
     AppDataSource = new DataSource(dataSourceOptions);
     await AppDataSource.initialize();
-    console.log('Data Source has been initialized!', database);
+    console.log('Data Source has been initialized!', path.resolve(process.cwd(), database));
 
     // Create the 'users' table if it doesn't exist
     await createUsersTable();

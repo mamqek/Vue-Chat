@@ -4,6 +4,8 @@ import { DefaultUser } from '../entities/DefaultUser';
 import { LoggerOptions } from 'typeorm';
 import { generateCustomUserClass } from './user.config';
 import { UserFieldMapping } from '../types/UserConfig';
+import path from 'path';
+
 
 export type SessionLookupFn = (sessionId: string) => Promise<any>;
 
@@ -29,7 +31,8 @@ export interface MyEnvConfig {
     
     CORS_ORIGIN?: Array<string>;                   // The URL to allow CORS requests from
     
-    UPLOAD_DIR?: string;
+    UPLOAD_URL: string;
+    UPLOAD_DIR: string;
     user_filter?: string | Record<string, any>; // f.e '{"active": true, "role": "admin"}' as sting or { active: true, role: 'admin' } as object
     
     // Database configuration
@@ -57,7 +60,9 @@ const defaultConfig: MyEnvConfig = {
 
     PORT: 4000,
     SERVICE_URL: "http://localhost:4000",
-    UPLOAD_DIR: "uploads",
+    
+    UPLOAD_DIR: 'uploads',
+    UPLOAD_URL: "uploads",
 
     CORS_ORIGIN: ['http://localhost:5174', 'http://localhost:5173'],
 

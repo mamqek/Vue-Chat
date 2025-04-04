@@ -86,10 +86,10 @@ export class ChatService {
    */
     async processAttachments(message: ChatMessage, attachments: Express.Multer.File[]): Promise<ChatMessage> {
         const SERVICE_URL = getConfigVariable("SERVICE_URL");
-        const UPLOAD_DIR = getConfigVariable("UPLOAD_DIR");
+        const UPLOAD_URL = getConfigVariable("UPLOAD_URL");
 
         const files = attachments.map(attachment => ({
-            url:  `${SERVICE_URL}/${UPLOAD_DIR}/${attachment.filename}`,  // use the filename saved by multer
+            url:  `${SERVICE_URL}/${UPLOAD_URL}/${attachment.filename}`,  // use the filename saved by multer
             name: attachment.originalname,
             type: attachment.mimetype,
         }));

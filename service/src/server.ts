@@ -52,12 +52,13 @@ export async function startService(userConfig?: Partial<MyEnvConfig>) {
     };
     app.use(cors(corsOptions));
     
+    // authMiddleware is a custom middleware function that checks for a valid JWT in the Authorization header.
+    // requires cookie-parser to be used before it, to catch cookie info within code
     app.use(cookieParser());
     app.use(authMiddleware);
-    //TODO: connect path to config variable
+
     // 3b. Serve static files from the /uploads directory
-    app.use('/uploads', express.static(path.resolve(__dirname, '../uploads')));
-    // authMiddleware is a custom middleware function that checks for a valid JWT in the Authorization header.
+    app.use(`/${getConfigVariable("UPLOAD_URL")}`, express.static(getConfigVariable("UPLOAD_DIR")));
 
     // 4. Mount the Routes Module
     app.use('/', router);
