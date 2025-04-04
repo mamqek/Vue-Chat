@@ -109,26 +109,9 @@ export function setConfig(newConfig: Partial<MyEnvConfig>) {
     mergeConfig(newConfig);
 }
 
-// Merge the new config into the defaults.
-function mergeConfig(newConfig: Partial<MyEnvConfig>) {
-    currentConfig = { ...defaultConfig, ...newConfig };
-    const customMapping = newConfig.User?.field_mapping;
-    // Merge field mapping with default if provided
-    if (customMapping) {
-        mergeFieldMapping(customMapping);
-        console.log("Generating CustomUser entity based on field mapping...");
-        // Dynamically generate the CustomUser entity
-        const CustomUser = generateCustomUserClass(currentConfig.User.field_mapping);
-        // Update the User entity in the configuration
-        currentConfig.User.user_entity = CustomUser;
-    } else {
-        // Use DefaultUser if no custom mapping is provided
-        currentConfig.User.user_entity = DefaultUser;
-    }
-}
-
 export function setConfigVariable(key: string, value: any) {
-    currentConfig = { ...currentConfig, [key]: value };
+    const newConfig: Partial<MyEnvConfig> = { [key]: value };
+    mergeConfig(newConfig);
     validateConfig(currentConfig);
 }
 
@@ -145,33 +128,50 @@ export function getConfigVariable<K extends keyof MyEnvConfig>(variable: K): MyE
 }
 
 export function getParsedConfigVariable<K extends keyof MyEnvConfig>(variable: K): Record<string, any> {
-  const value = currentConfig[variable];
-  if (typeof value === 'string') {
-    try {
-      return JSON.parse(value);
-    } catch (error) {
-      console.error(`Error parsing config variable "${variable}":`, error);
-      return {};
+    const value = currentConfig[variable];
+    if (typeof value === 'string') {
+        try {
+            return JSON.parse(value);
+        } catch (error) {
+            console.error(`Error parsing config variable "${variable}":`, error);
+            return {};
+        }
     }
-  }
-  return (value as Record<string, any>) || {};
+    return (value as Record<string, any>) || {};
 }
 
 export function isDefault<K extends keyof MyEnvConfig>(variable: K): boolean {
     return currentConfig[variable] === defaultConfig[variable];
 }
 
+// Merge the new config into the defaults.
+function mergeConfig(newConfig: Partial<MyEnvConfig>) {
+    currentConfig = { ...currentConfig, ...newConfig };
+    const customMapping = newConfig.User?.field_mapping;
+    // Merge field mapping with default if provided
+    if (customMapping) {
+        mergeFieldMapping(customMapping);
+        console.log("Generating CustomUser entity based on field mapping...");
+        // Dynamically generate the CustomUser entity
+        const CustomUser = generateCustomUserClass(currentConfig.User.field_mapping);
+        // Update the User entity in the configuration
+        currentConfig.User.user_entity = CustomUser;
+    } else {
+        // Use DefaultUser if no custom mapping is provided
+        currentConfig.User.user_entity = DefaultUser;
+    }
+}
+
 function mergeFieldMapping(customMapping: UserFieldMapping): void {
     const defaultMapping = defaultConfig.User.field_mapping;
     const mergedMapping: Partial<UserFieldMapping> = {};
-    
+
     // For each key in the default mapping, use the custom mapping if provided,
     // otherwise fallback to the default mapping.
     (Object.keys(defaultMapping) as (keyof UserFieldMapping)[]).forEach(key => {
         mergedMapping[key] = customMapping && customMapping[key] ? customMapping[key] : defaultMapping[key];
     });
     currentConfig.User.field_mapping = mergedMapping;
-    console.log("mergedMapping", mergedMapping);
 }
 
 // Validate required or mutually-exclusive configuration.
