@@ -34,16 +34,19 @@ export class UserMigration1680300000005 implements MigrationInterface {
                 }),
                 true,
             );
+
+            console.log("Columns added:", columns.map(col => col.name).join(", "));
+
         } else {
             console.warn("Table 'users' detected. Checking presence of required and provided columns.");
 
             // Check if the table has the required columns.
             const columnNames = columns.map(col => col.name);
             const existingColumnNames = table.columns.map(column => column.name);
-            const missingColumnNames = columnNames.filter(column => !existingColumnNames.includes(column));
+            const columnsToAddNames = columnNames.filter(column => !existingColumnNames.includes(column));
 
-            if (missingColumnNames.length > 0) {
-                console.warn(`Missing columns in 'users' table: ${missingColumnNames.join(", ")}`);
+            if (columnsToAddNames.length > 0) {
+                console.warn(`Missing columns in 'users' table: ${columnsToAddNames.join(", ")}`);
 
                 const userWantsToAddColumns = await promptUser(
                     `Do you want to add these columns? Choose 'n' if you want to change custom mapping (y/n): `
@@ -52,9 +55,12 @@ export class UserMigration1680300000005 implements MigrationInterface {
                 if (!userWantsToAddColumns) {
                     throw new Error('Canceled to provide custom User entity. Exiting...');
                 } 
+            } else {
+                console.warn("All required columns are present in the 'users' table. No changes needed.");
+                return;
             }
 
-            const columnsToAdd = columns.filter(col => missingColumnNames.includes(col.name));
+            const columnsToAdd = columns.filter(col => columnsToAddNames.includes(col.name));
             
             // Check if the table already has records.
             const rowCount = await queryRunner.manager
@@ -83,6 +89,7 @@ export class UserMigration1680300000005 implements MigrationInterface {
                 );
             }
 
+            console.log("Columns added:", columnsToAdd.map(col => col.name).join(", "));
         }
 
         console.log("Migration for User table completed successfully.");
