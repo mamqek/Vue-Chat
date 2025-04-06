@@ -8,6 +8,11 @@ import {
 
 export class ChatMigration1680300000000 implements MigrationInterface {
     public async up(queryRunner: QueryRunner): Promise<void> {
+        if (await queryRunner.getTable("chats")) {
+            console.warn("Table 'chats' already exists. Skipping 'up' migration.");
+            return;
+        }
+
         await queryRunner.createTable(
             new Table({
                 name: "chats",

@@ -7,6 +7,11 @@ import {
 
 export class ChatMessageStatusMigration1680300000002 implements MigrationInterface {
     public async up(queryRunner: QueryRunner): Promise<void> {
+        if (await queryRunner.getTable("chat_message_statuses")) {
+            console.warn("Table 'chat_message_statuses' already exists. Skipping 'up' migration.");
+            return;
+        }
+
         await queryRunner.createTable(
             new Table({
                 name: "chat_message_statuses",
