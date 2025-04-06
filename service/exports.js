@@ -13,5 +13,5 @@ import chatService, {
 } from './src/chatService';
 export { chatService, setChatServiceInstance, getChatServiceInstance, ChatService };
 
-import { handleMigrations } from './src/database/migrationUtils';
-export { handleMigrations };
+import { handleMigrations, revertMigrations } from './src/database/migrationUtils';
+export { handleMigrations, revertMigrations };

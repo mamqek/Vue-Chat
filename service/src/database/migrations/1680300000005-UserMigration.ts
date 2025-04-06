@@ -102,29 +102,44 @@ export class UserMigration1680300000005 implements MigrationInterface {
             return;
         }
 
-        // Define the column names we want to remove.
-        const columnsToRemove = ["full_name", "avatar", "bio"];
+        const migrationsTable = await queryRunner.getTable("chat_migrations");
+        if (!migrationsTable) {
+            console.warn("Table 'chat_migrations' does not exist. Something went wrong while finishing User migration. Please provide added column names to new column 'columns' in chat_migrations table manually to resolve.");
+            return;
+        }
 
+        const migrationName = "UserMigration%"; // Use a wildcard to match names starting with "UserMigration"
+        const records = await queryRunner.query(
+            `SELECT * FROM chat_migrations WHERE name LIKE ?`,
+            [migrationName]
+        );
+
+        if (records.length === 0) {
+            console.warn(`No record found in 'chat_migrations' table with name '${migrationName}'.`);
+            return;
+        }
+        const record = records[0];
+
+        // Get stored added column names from the 'chat_migrations' table.
+        const columnsToRemove = record.columns.split(",").map((col: string) => col.trim());
+
+        // If all columns in the 'users' table are marked for removal, drop the table.
+        const userTableColumnNames = table.columns.map((col) => col.name);
+        const allColumnsToRemove = userTableColumnNames.every((colName) => columnsToRemove.includes(colName));
+        if (allColumnsToRemove) {
+            console.log("All columns in the 'users' table are marked for removal. Dropping the table...");
+            await queryRunner.dropTable("users");
+            console.log("Table 'users' dropped successfully.");
+            return;
+        }
+        
+        // Otherwise, drop only the specified columns.
         for (const colName of columnsToRemove) {
             const column = table.columns.find(c => c.name === colName);
             if (column) {
                 console.log(`Dropping column "${colName}" from 'users' table.`);
                 await queryRunner.dropColumn("users", colName);
             }
-        }
-
-        // Check if only the core columns remain.
-        const remainingColumnNames = table.columns.map(c => c.name);
-        const coreColumns = ["id", "created_at", "updated_at"];
-        const onlyCoreRemain =
-            remainingColumnNames.length === coreColumns.length &&
-            coreColumns.every(name => remainingColumnNames.includes(name));
-
-        if (onlyCoreRemain) {
-            console.log(`Only core columns (${coreColumns.join(", ")}) remain. Dropping the 'users' table.`);
-            await queryRunner.dropTable("users");
-        } else {
-            console.log("Other columns still exist. Not dropping the table.");
         }
     }
 

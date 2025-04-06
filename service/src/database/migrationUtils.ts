@@ -13,6 +13,12 @@ if (require.main === module) {
         } catch (error) {
             console.error("Migration running failed:", error);
         }
+    } else if (args.includes("--revert")) {
+        try {
+            revertMigrations();
+        } catch (error) {
+            console.error("Migration reverting failed:", error);
+        }
     } else {
         // If the "--other" flag is passed, execute other logic
         handleMigrations().catch((error) => {
@@ -151,6 +157,51 @@ async function runMigrations(): Promise<void> {
     });
 }
 
+export async function revertMigrations(): Promise<void> {
+    console.log("Reverting migrations...");
+    const dataSourcePath = path.resolve(__dirname, "../dist/dataSourceRef.js");
+
+    // Add User_Config to ENV so spawned process has access to config developer provided (needed for User migration)
+    const USER_CONFIG = JSON.stringify(getConfig());
+    return new Promise((resolve, reject) => {
+        // Use spawn here as it might be interactive prompt 
+        const child = spawn("npx.cmd", ["typeorm", "migration:revert", "-d", dataSourcePath], {
+            env: { ...process.env, USER_CONFIG },
+            stdio: ['inherit', 'pipe', 'pipe'], // Capture stdout and stderr
+        });
+
+        let migrationsCompleted = 0;
+        child.stdout.on("data", (data) => {
+            console.log(data.toString()); // Log the output to the console
+            if (data.toString().includes("Migration for")) {
+                console.log(data.toString()); // Log the output to the console
+                migrationsCompleted++;
+            }
+        });
+
+        child.stderr.on("data", (data) => {
+            console.error(data.toString());
+        });
+
+        child.on("close", (code) => {
+            if (code === 0) {
+                if (migrationsCompleted === 0) {
+                    console.log("Nothing to revert.");
+                } else {
+                    console.log(`${migrationsCompleted} migrations run successfully.`);
+                }
+                resolve();
+            } else {
+                reject(new Error(`Migration process exited with code ${code}`));
+            }
+        });
+
+        child.on("error", (error) => {
+            console.error(`Error running migrations: ${error.message}`);
+            reject(error);
+        });
+    });
+}
 
 async function saveAddedUserColumns(addedColumnsNames: string | null): Promise<void> {
     try {
