@@ -26,6 +26,9 @@ if (require.main === module) {
 import path from "path";
 import { getConfig } from "../config/config.server";
 import { spawn, exec } from "child_process";
+import { AppDataSource } from "./dataSource";
+import { TableColumn } from "typeorm";
+
 
 // Wrap the exec commands in a Promise so program waits for it to finish
 // TODO: add revert method to revert migrations
@@ -107,11 +110,14 @@ async function runMigrations(): Promise<void> {
             stdio: ['inherit', 'pipe', 'pipe'], // Capture stdout and stderr
         });
 
+        let addedColumnsNames: string | null = null;
         let migrationsCompleted = 0;
         child.stdout.on("data", (data) => {
             if (data.toString().includes("Migration for")) {
                 console.log(data.toString()); // Log the output to the console
                 migrationsCompleted++;
+            } else if (data.toString().includes("Columns added:")) {    // for users migration, save which columns were added to the table
+                addedColumnsNames = data.toString().split("Columns added:")[1].trim();
             }
         });
 
@@ -122,6 +128,11 @@ async function runMigrations(): Promise<void> {
         child.on("close", (code) => {
 
             if (code === 0) {
+                if (addedColumnsNames) {
+                    saveAddedUserColumns(addedColumnsNames).catch((error) => {
+                        console.error("Error saving added user columns:", error);
+                    });
+                }
                 if (migrationsCompleted === 0) {
                     console.log("All migrations are already up to date.");
                 } else {
@@ -138,6 +149,64 @@ async function runMigrations(): Promise<void> {
             reject(error);
         });
     });
+}
+
+
+async function saveAddedUserColumns(addedColumnsNames: string | null): Promise<void> {
+    try {
+        console.log("Checking and updating the 'chat_migrations' table...");
+
+        const queryRunner = AppDataSource.createQueryRunner();
+
+        // Check if the `chat_migrations` table exists
+        const table = await queryRunner.getTable("chat_migrations");
+        if (!table) {
+            console.warn("The 'chat_migrations' table does not exist. Skipping update.");
+            await queryRunner.release();
+            return;
+        }
+
+        // Check if the `columns` column exists in the `chat_migrations` table
+        const columnExists = table?.columns.some((col) => col.name === "columns");
+        if (!columnExists) {
+            console.log("Adding 'columns' column to the 'chat_migrations' table...");
+            await queryRunner.addColumn(
+                "chat_migrations",
+                new TableColumn({
+                    name: "columns",
+                    type: "text",
+                    isNullable: true, // Make the column nullable
+                })
+            );
+        }
+
+        const migrationNamePrefix = "UserMigration%"; 
+        const records = await queryRunner.query(
+            `SELECT * FROM chat_migrations WHERE name LIKE ?`,
+            [migrationNamePrefix]
+        );
+        if (records.length === 0) {
+            console.warn(`No record found in 'chat_migrations' table with prefix '${migrationNamePrefix}'.`);
+        } else {
+            const migrationName =records[0].name;
+            console.log(`Found record for migration '${migrationName}'. Updating 'columns' field...`);
+
+            // Update the `columns` field with `addedColumnsNames`
+            await queryRunner.query(
+                `UPDATE chat_migrations SET columns = ? WHERE name = ?`,
+                [addedColumnsNames, migrationName]
+            );
+            console.log(`'columns' field updated successfully.`);
+            console.log(`Added columns names: ${addedColumnsNames}`); // Log the output to the console
+
+            console.log(`Record for migration '${migrationName}' updated successfully.`);
+        }
+
+        // Release the query runner after use
+        await queryRunner.release();
+    } catch (error) {
+        console.error("Error updating the 'chat_migrations' table:", error);
+    }
 }
 
 
