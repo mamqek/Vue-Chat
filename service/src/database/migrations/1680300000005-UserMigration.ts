@@ -57,8 +57,12 @@ export class UserMigration1680300000005 implements MigrationInterface {
             const columnsToAdd = columns.filter(col => missingColumnNames.includes(col.name));
             
             // Check if the table already has records.
-            const records = await queryRunner.query(`SELECT COUNT(*) as count FROM "users"`);
-            const rowCount = parseInt(records[0].count, 10);
+            const rowCount = await queryRunner.manager
+                .createQueryBuilder()
+                .select("COUNT(*)", "count") // Select the count of rows
+                .from(table.name, "t") // Use the table name dynamically
+                .getRawOne(); // Execute the query and get the result
+
             if (rowCount > 0) {
                 console.log(`Table 'users' already has ${rowCount} records. Checking for default values or nullable columns.`);
                 for (const column of columnsToAdd) {
