@@ -1,4 +1,4 @@
-import { PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { PrimaryGeneratedColumn, getMetadataArgsStorage, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 
 // BaseUser is an abstract class that defines the common properties of all user entities.
 // It includes the id, created_at, and updated_at fields which are added to all user entities.
@@ -16,8 +16,11 @@ export abstract class BaseUser {
         for (const property of requiredProperties) {
             const descriptor = Object.getOwnPropertyDescriptor(prototype, property);
            
-            // Check if the property is decorated with @Column
-            const isColumn = Reflect.hasMetadata('design:type', prototype, property);
+            // Check if the property is decorated with @Column using TypeORM's metadata storage
+            const isColumn = getMetadataArgsStorage().columns.find(
+                (column) => column.target === prototype.constructor && column.propertyName === property
+            );
+
             if (!descriptor?.get && !isColumn) {
                 throw new Error(`Derived class must implement '${property}' getter.`);
             }
