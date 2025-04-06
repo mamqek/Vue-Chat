@@ -32,8 +32,9 @@ if (require.main === module) {
 import path from "path";
 import { getConfig } from "../config/config.server";
 import { spawn, exec } from "child_process";
-import { AppDataSource } from "./dataSource";
+import { AppDataSource, promptUser } from "./dataSource";
 import { TableColumn } from "typeorm";
+
 
 
 // Wrap the exec commands in a Promise so program waits for it to finish
@@ -132,7 +133,6 @@ async function runMigrations(): Promise<void> {
         });
 
         child.on("close", (code) => {
-
             if (code === 0) {
                 if (addedColumnsNames) {
                     saveAddedUserColumns(addedColumnsNames).catch((error) => {
@@ -160,20 +160,19 @@ async function runMigrations(): Promise<void> {
 export async function revertMigrations(): Promise<void> {
     console.log("Reverting migrations...");
     const dataSourcePath = path.resolve(__dirname, "../dist/dataSourceRef.js");
-
+    
     // Add User_Config to ENV so spawned process has access to config developer provided (needed for User migration)
     const USER_CONFIG = JSON.stringify(getConfig());
-    return new Promise((resolve, reject) => {
+    let migrationsCompleted = 0;
+    await new Promise<void>((resolve, reject) => {
         // Use spawn here as it might be interactive prompt 
         const child = spawn("npx.cmd", ["typeorm", "migration:revert", "-d", dataSourcePath], {
             env: { ...process.env, USER_CONFIG },
             stdio: ['inherit', 'pipe', 'pipe'], // Capture stdout and stderr
         });
 
-        let migrationsCompleted = 0;
         child.stdout.on("data", (data) => {
-            console.log(data.toString()); // Log the output to the console
-            if (data.toString().includes("Migration for")) {
+            if (data.toString().includes("Revert migration")) {
                 console.log(data.toString()); // Log the output to the console
                 migrationsCompleted++;
             }
@@ -188,7 +187,7 @@ export async function revertMigrations(): Promise<void> {
                 if (migrationsCompleted === 0) {
                     console.log("Nothing to revert.");
                 } else {
-                    console.log(`${migrationsCompleted} migrations run successfully.`);
+                    console.log(`${migrationsCompleted} migration reverted successfully.`);
                 }
                 resolve();
             } else {
@@ -197,10 +196,23 @@ export async function revertMigrations(): Promise<void> {
         });
 
         child.on("error", (error) => {
-            console.error(`Error running migrations: ${error.message}`);
+            console.error(`Error running reverts: ${error.message}`);
             reject(error);
         });
     });
+
+    if (migrationsCompleted !== 0) {
+        const runAgain = await promptUser(
+            `Do you want to revert next migration? (y/n): `
+        );
+
+        if (runAgain) {
+            await revertMigrations();
+        } else {
+            console.log("Migration process completed. Exiting...");
+        }
+    }
+
 }
 
 async function saveAddedUserColumns(addedColumnsNames: string | null): Promise<void> {

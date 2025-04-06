@@ -1,11 +1,10 @@
 import { initDatasource } from './database/dataSource';
 import { DataSource } from 'typeorm';
 
-import { setConfig, MyEnvConfig, getConfigVariable, setConfigVariable} from './config/config.server';
+import { setConfig, MyEnvConfig, getConfigVariable} from './config/config.server';
 
 import express from 'express';
 import http from 'http';
-import path from 'path';
 import cookieParser from 'cookie-parser';
 import cors from 'cors'; 
 import { authMiddleware } from './auth/authMiddleware';
@@ -13,10 +12,6 @@ import { authMiddleware } from './auth/authMiddleware';
 import { Server } from 'socket.io';
 import { setupSocket } from './socket'; 
 import router from './router'; 
-
-
-
-import { CustomUser } from './entities/CustomUser';
 
 
 let server: http.Server | null = null;

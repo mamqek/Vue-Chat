@@ -144,5 +144,7 @@ export class ChatMessageMigration1680300000001 implements MigrationInterface {
 
         // Drop the table.
         await queryRunner.dropTable("chat_messages");
+
+        console.log("Revert migration for ChatMessage table completed successfully.");
     }
 }

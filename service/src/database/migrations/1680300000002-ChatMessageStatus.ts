@@ -76,5 +76,7 @@ export class ChatMessageStatusMigration1680300000002 implements MigrationInterfa
         }
 
         await queryRunner.dropTable("chat_message_statuses");
+
+        console.log("Revert migration for ChatMessageStatus table completed successfully.");
     }
 }

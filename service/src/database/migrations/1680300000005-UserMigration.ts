@@ -141,6 +141,8 @@ export class UserMigration1680300000005 implements MigrationInterface {
                 await queryRunner.dropColumn("users", colName);
             }
         }
+
+        console.log("Revert migration for User table completed successfully.");
     }
 
     buildUserTableColumns() : TableColumnOptions[] {
