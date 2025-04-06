@@ -1,10 +1,9 @@
-import { UserConfig } from '../types/UserConfig';
 import { setCommonConfig } from '../../../config/config.common';
 import { DefaultUser } from '../entities/DefaultUser';
 import { LoggerOptions } from 'typeorm';
 import { generateCustomUserClass } from './user.config';
 import { UserFieldMapping } from '../types/UserConfig';
-import path from 'path';
+import { BaseUser } from '../entities/BaseUser';
 
 
 export type SessionLookupFn = (sessionId: string) => Promise<any>;
@@ -51,7 +50,8 @@ export interface MyEnvConfig {
     JWT_ALGORITHM?: string;
     sessionLookup: SessionLookupFn;
 
-    User: UserConfig;
+    user_entity: new (...args: any[]) => BaseUser;
+    user_mapping: UserFieldMapping;
 }
 
 // Define default values.
@@ -85,23 +85,21 @@ const defaultConfig: MyEnvConfig = {
         throw new Error("sessionLookup function not implemented");
     },
 
-    User: {
-        user_entity: DefaultUser, 
-        field_mapping: {
-            full_name: {
-                name: "full_name",
-                default: "'User'",
-            },
-            avatar: {
-                name: "avatar",
-                default: "'https://example.com/default-avatar.png'",
-            },
-            bio: {
-                name: "bio",
-                isNullable: true,
-            },
+    user_entity: DefaultUser, 
+    user_mapping: {
+        full_name: {
+            name: "full_name",
+            default: "'User'",
         },
-    }
+        avatar: {
+            name: "avatar",
+            default: "'https://example.com/default-avatar.png'",
+        },
+        bio: {
+            name: "bio",
+            isNullable: true,
+        },
+    },
 };
 
 let currentConfig: MyEnvConfig = { ...defaultConfig };
@@ -151,23 +149,22 @@ export function isDefault<K extends keyof MyEnvConfig>(variable: K): boolean {
 // Merge the new config into the defaults.
 function mergeConfig(newConfig: Partial<MyEnvConfig>) {
     currentConfig = { ...currentConfig, ...newConfig };
-    const customMapping = newConfig.User?.field_mapping;
     // Merge field mapping with default if provided
-    if (customMapping) {
-        mergeFieldMapping(customMapping);
+    if (!isDefault("user_mapping")) {
+        mergeFieldMapping(currentConfig.user_mapping);
         console.log("Generating CustomUser entity based on field mapping...");
         // Dynamically generate the CustomUser entity
-        const CustomUser = generateCustomUserClass(currentConfig.User.field_mapping);
+        const CustomUser = generateCustomUserClass(currentConfig.user_mapping);
         // Update the User entity in the configuration
-        currentConfig.User.user_entity = CustomUser;
+        currentConfig.user_entity = CustomUser;
     } else {
         // Use DefaultUser if no custom mapping is provided
-        currentConfig.User.user_entity = DefaultUser;
+        currentConfig.user_entity = DefaultUser;
     }
 }
 
 function mergeFieldMapping(customMapping: UserFieldMapping): void {
-    const defaultMapping = defaultConfig.User.field_mapping;
+    const defaultMapping = defaultConfig.user_mapping;
     const mergedMapping: Partial<UserFieldMapping> = {};
 
     // For each key in the default mapping, use the custom mapping if provided,
@@ -175,15 +172,15 @@ function mergeFieldMapping(customMapping: UserFieldMapping): void {
     (Object.keys(defaultMapping) as (keyof UserFieldMapping)[]).forEach(key => {
         mergedMapping[key] = customMapping && customMapping[key] ? customMapping[key] : defaultMapping[key];
     });
-    currentConfig.User.field_mapping = mergedMapping;
+    currentConfig.user_mapping = mergedMapping;
 }
 
 // Validate required or mutually-exclusive configuration.
 function validateConfig(config: Partial<MyEnvConfig>): void {
 
     // Check if keys in field_mapping are valid
-    if (config.User?.field_mapping) {
-        const mapping = config.User.field_mapping;
+    if (config.user_mapping) {
+        const mapping = config.user_mapping;
         const allowedKeys: (keyof UserFieldMapping)[] = ["full_name", "avatar", "bio"];
         Object.keys(mapping).forEach(key => {
             if (!allowedKeys.includes(key as keyof UserFieldMapping)) {

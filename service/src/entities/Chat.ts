@@ -20,14 +20,14 @@ export class Chat {
         
     @ManyToOne(() => {
         const config = getConfig();
-        return config.User.user_entity;
+        return config.user_entity;
     }, { eager: true, cascade: true })
     @JoinColumn({ name: 'user1_id' })
     user1!: BaseUser;
 
     @ManyToOne(() => {
         const config = getConfig();
-        return config.User.user_entity;
+        return config.user_entity;
     }, { eager: true, cascade: true })
     @JoinColumn({ name: 'user2_id' })
     user2!: BaseUser;

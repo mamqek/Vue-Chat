@@ -1,4 +1,3 @@
-import 'reflect-metadata';
 import { initDatasource } from './database/dataSource';
 import { DataSource } from 'typeorm';
 

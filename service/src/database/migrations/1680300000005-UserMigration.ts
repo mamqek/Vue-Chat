@@ -151,13 +151,13 @@ export class UserMigration1680300000005 implements MigrationInterface {
             setConfig(JSON.parse(ENVConfig));
         }
         
-        if (!isDefault("User")) {
+        if (!isDefault("user_mapping")) {
             console.warn("Custom mapping provided. Using custom User entity.");
         } else {
             console.warn("No custom mapping provided. Using default User entity.");
         }
 
-        const mapping: UserFieldMapping = getConfigVariable("User").field_mapping;
+        const mapping: UserFieldMapping = getConfigVariable("user_mapping");
 
         const columns: TableColumnOptions[] = Object.values(mapping).map(column =>
             ({ ...column, type: "text" })

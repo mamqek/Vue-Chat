@@ -118,7 +118,7 @@ export class ChatService {
         });
 
         if (!chat) {
-            let User = getConfigVariable("User").user_entity;
+            let User = getConfigVariable("user_entity");
             const userRepository = AppDataSource.getRepository(User);
             const user1 : BaseUser | null = await userRepository.findOneBy({ id: authUserId }) as BaseUser | null;
             const user2 : BaseUser | null = await userRepository.findOneBy({ id: receiverId }) as BaseUser | null;
@@ -258,7 +258,7 @@ export class ChatService {
     async getOtherChatters(): Promise<BaseUser[]> {
         const authUserId = getAuthUser().id;
 
-        let User = getConfigVariable("User").user_entity;
+        let User = getConfigVariable("user_entity");
         const userRepository = AppDataSource.getRepository(User);
         // Use the provided filter if any; otherwise, get all users.
         const otherChatters = await userRepository.find({ where: {

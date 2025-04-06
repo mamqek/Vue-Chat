@@ -5,7 +5,7 @@ import { getConfigVariable } from '../config/config.server';
 import { BaseUser } from '../entities/BaseUser';
 
 export async function initializeData() {
-    let User = getConfigVariable("User").user_entity;
+    let User = getConfigVariable("user_entity");
     const userRepository = AppDataSource.getRepository(User);
     const userCount = await userRepository.count();
 
@@ -42,7 +42,7 @@ export async function initializeData() {
 }
 
 function createCustomUser(data: Partial<BaseUser>): BaseUser {
-    const UserConstructor = getConfigVariable("User").user_entity; // no parentheses
+    const UserConstructor = getConfigVariable("user_entity"); // no parentheses
     const user = new UserConstructor();
     if (data.full_name) user.full_name = data.full_name; // Invokes the setter
     if (data.bio) user.bio = data.bio; // Invokes the setter

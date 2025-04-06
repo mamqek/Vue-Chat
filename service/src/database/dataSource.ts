@@ -1,4 +1,5 @@
 import 'reflect-metadata';
+
 import { DataSource, DataSourceOptions, SimpleConsoleLogger } from 'typeorm';
 import { Chat } from '../entities/Chat';
 import { ChatMessage } from '../entities/ChatMessage';
@@ -24,11 +25,13 @@ export async function initDatasource() {
             Chat, 
             ChatMessage, 
             ChatMessageStatus, 
-            config.User.user_entity
+            config.user_entity
         ],
         synchronize: config.synchronize,
         dropSchema: false,
+
         migrations: [path.resolve(__dirname, '../dist/migrations/*.js')], 
+        migrationsTableName: 'chat_migrations', 
 
         // use SimpleConsoleLogger for logging, as even with logging: false, normal one shows logs
         logger: new SimpleConsoleLogger(config.logging as any),
@@ -49,6 +52,7 @@ export async function initDatasource() {
 }
 
 async function createUsersTable() {
+    
     const tableExists = await AppDataSource.query(
         "SELECT name FROM sqlite_master WHERE type='table' AND name='users'"
     );
@@ -77,7 +81,7 @@ async function createUsersTable() {
 export function promptUser(question: string): Promise<boolean> {
     const rl = readline.createInterface({
         input: process.stdin,
-        output: process.stdout,
+        output: process.stderr,
     });
 
     return new Promise((resolve) => {
