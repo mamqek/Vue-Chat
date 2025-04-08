@@ -1,6 +1,5 @@
 <template>
-    <div :class="{' tw-opacity-0 tw-pointer-events-none @3xl/window:tw-opacity-100 @3xl/window:tw-pointer-events-auto' : !chatStore.currentChat}" class="tw-@container/chat tw-absolute @3xl/window:tw-relative tw-bg-background @3xl/window:tw-bg-transparent tw-p-4 @3xl/window:tw-p-0 tw-inset-0 tw-z-20 tw-flex tw-flex-col tw-max-h-full tw-h-full ">
-        
+    <div :class="{' tw-opacity-0 tw-pointer-events-none @3xl/window:tw-opacity-100 @3xl/window:tw-pointer-events-auto' : !chatStore.currentChat}" class="tw-@container/chat tw-absolute @3xl/window:tw-relative tw-bg-background @3xl/window:tw-bg-transparent tw-p-4 @3xl/window:tw-p-0 tw-inset-0 tw-z-20 tw-flex tw-flex-col tw-max-h-full tw-h-full">
         <template v-if="loadedChatId">
             <!-- Header -->
             <div class="tw-flex tw-items-center tw-gap-4 tw-border-muted-foreground">
@@ -9,7 +8,7 @@
                     size="icon" 
                     class="@3xl/window:tw-hidden" 
                 >
-                    <i class='bx bx-arrow-back ' ></i>
+                    <i class='bx bx-arrow-back'></i>
                 </Button>
 
                 <a v-if="chatStore.currentReceiver" class="tw-group tw-relative tw-flex tw-min-w-0 tw-cursor-pointer tw-items-center tw-gap-4 tw-py-4 tw-text-current" :href="`/users/${chatStore.currentReceiver.id}/profile`">

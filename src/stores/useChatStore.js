@@ -1,7 +1,6 @@
 import { defineStore } from 'pinia';
 import { axios } from '../plugins/axios'
-import socket from '@/socketClient';
-
+import { socket } from '@/socketClient';
 
 export const useChatStore = defineStore('chat', {
     state: () => ({
@@ -40,6 +39,7 @@ export const useChatStore = defineStore('chat', {
 
             if (user_id) {
                 // To create cookie with user_id, so service knows who is logged in
+                // console.log('Logging in with user_id:', user_id);
                 await axios.post("/login", { user_id })
                 .then(({ data }) => {
                     this.init(user_id);
@@ -69,26 +69,12 @@ export const useChatStore = defineStore('chat', {
         joinReceivingChannel(user_id) {
             // Join a private room via Socket.IO
             socket.emit('joinPrivateChannel', { user_id });
-            console.log('Joined private channel for user:', user_id);
+            // console.log('Joined private channel for user:', user_id);
 
             // Bind event handlers directly on the socket connection
             socket.on('messageSent', this.messageReceived);
             socket.on('markAsRead', this.markedAsRead);
             socket.on('chatCreated', this.addChat);
-        },
-
-
-        joinOnlineStatusChannel() {
-            let userOnlineChannel = window.Echo.join("agora-online-channel");
-            userOnlineChannel.here((users) => {
-                this.usersOnline = users.map(user => user.id);
-            })
-            .joining((user) => {            
-                this.usersOnline.push(user.id);
-            })
-            .leaving((user) => {            
-                this.usersOnline = this.usersOnline.filter(u => u != user.id);
-            });
         },
 
         joinOnlineStatusChannel() {
@@ -128,7 +114,7 @@ export const useChatStore = defineStore('chat', {
                 }
 
                 this.chats = data;
-                console.log('Chats fetched!');
+                // console.log('Chats fetched!');
             } catch (error) {
                 console.error("Error fetching chats:", error);
                 if (retries > 0) {
@@ -157,7 +143,7 @@ export const useChatStore = defineStore('chat', {
             
             await axios.get(`/openChat/${chat_id}`)
             .then(({ data }) => {
-                console.log('Chat history fetched');
+                // console.log('Chat history fetched');
                 this.chatHistory[chat_id] = data;
                 let chat = this.chats.find(chat => chat.id == chat_id);
                 chat[this.getChatUserColumnName(chat_id) + '_unread_count'] = 0;
@@ -189,7 +175,7 @@ export const useChatStore = defineStore('chat', {
         },
 
         addMessage(message, chat_id) {
-            console.log('Adding message:', message, chat_id);
+            // console.log('Adding message:', message, chat_id);
             
             // Don't add the message if the chat history is not loaded, so it will be fetched when the chat is opened
             if (!this.chatHistory[chat_id]) return;
