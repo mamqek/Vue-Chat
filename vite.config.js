@@ -22,6 +22,7 @@ export default defineConfig(({ command }) => ({
             name: 'ChatWidget',
             fileName: 'chat-widget',
             formats: ["es", "umd"],
+            exports: 'named', // Ensure named exports are included
         },
         rollupOptions: {
             external: ["vue", "service", "@vue/devtools-api"], // Dont include these into build output
