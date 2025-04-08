@@ -54,7 +54,7 @@ export default {
 
     props: {
         userId: {
-            type: Number,
+            type: [String, Number],
             required: true,
         },
         preOpenChatId: {
