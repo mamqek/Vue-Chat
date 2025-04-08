@@ -58,26 +58,22 @@ if (!customElements.get('chat-widget')) {
  * It allows you to initialize the widget via JavaScript instead of placing the HTML tag manually.
  *
  * @param {Object} config - Configuration options for the chat widget.
- * @param {HTMLElement} config.container - The DOM element where the widget will be appended.
- * @param {*} [config.authUser] - (Optional) An object with authentication or user details.
- *                                This value will be JSON-stringified and set as the "auth-user" attribute.
- * @param {string} [config.apiEndpoint] - (Optional) A URL string specifying the API endpoint the widget should use.
+ * @param {HTMLElement} config.CONTAINER - The DOM element where the widget will be appended.
  */
 export function initChatWidget(config) {
-  // Create the custom chat widget element.
-  const widget = document.createElement('chat-widget');
+    if (!config) {
+        console.error("ChatWidget: No config provided to initChatWidget(). Please provide a valid config object or this function will not work.");
+        return;
+    }
 
-  // If an authUser is provided, set it as a JSON string attribute.
-  if (config.authUser) {
-    widget.setAttribute('auth-user', JSON.stringify(config.authUser));
-  }
+    if (!config.CONTAINER) {
+        console.error("ChatWidget: No container provided. Please provide a valid container element or use the HTML tag.");
+        return;
+    }
 
-  // (Optional) If an API endpoint is provided, set it as an attribute.
-  // Uncomment the next lines if your widget expects an "api-endpoint" attribute.
-  // if (config.apiEndpoint) {
-  //   widget.setAttribute('api-endpoint', config.apiEndpoint);
-  // }
+    setCommonConfig(config);
 
-  // Append the widget to the specified container element.
-  config.container.appendChild(widget);
+    const widget = document.createElement('chat-widget');
+    widget.setAttribute('user_id', getCommonConfig().USER_ID);
+    config.CONTAINER.appendChild(widget);
 }
