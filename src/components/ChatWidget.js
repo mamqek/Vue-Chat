@@ -7,18 +7,19 @@ import ChatCircle from './ChatCircle.vue';
 
 import { createPinia } from 'pinia';
 import vuetify from '../plugins/vuetify'
-import { axios } from '../plugins/axios'
+
+import { axios, updateAxiosInstance } from '../plugins/axios'
+import { updateSocketInstance } from '@/socketClient';
+import { setCommonConfig, getCommonConfig } from '../../config/config.common.js';
+
 
 export class ChatWidget extends HTMLElement {
-
     constructor() {
         super();
         // Attach a shadow root to encapsulate styles.
         this.shadowRootInstance = this.attachShadow({ mode: 'open' });
 
         // Inject CSS directly into the shadow root
-        console.log("main", mainCss);
-        console.log("compiled", vuetifyStyles);
         const combinedCss = `${vuetifyStyles}\n${mainCss}`;
         const styleEl = document.createElement('style');
         styleEl.textContent = combinedCss;
@@ -30,27 +31,39 @@ export class ChatWidget extends HTMLElement {
         const container = document.createElement('div');
         this.shadowRootInstance.appendChild(container);
 
-        // Parse an optional advisor-filter attribute.
-        const user_id = this.getAttribute('user_id');
+        this.extractAttributes();
 
         // Create the Vue app, providing the auth user as a prop.
-        const app = createApp(ChatCircle, { userId: user_id || null });
+        const app = createApp(ChatCircle, { userId: getCommonConfig().USER_ID });
 
         // Install Pinia, axios and Vuetify.
         app.use(vuetify);
-        
         app.config.globalProperties.$axios = axios;
         app.use(createPinia()); 
         app.mount(container);
     }
+
+    extractAttributes() {
+        const commonConfig = getCommonConfig();
+    
+        const user_id = this.getAttribute('user_id') || commonConfig.USER_ID;
+        const token_name = this.getAttribute('token') || commonConfig.TOKEN_NAME;
+        const service_url = this.getAttribute('service_url') || commonConfig.SERVICE_URL;
+    
+        if (token_name || service_url || user_id) { 
+            setCommonConfig({ USER_ID: user_id, TOKEN_NAME: token_name, SERVICE_URL: service_url });
+            updateSocketInstance();
+            updateAxiosInstance();
+        }
+    }
 }
+
 
 // Register the custom element globally.
 if (!customElements.get('chat-widget')) {
     customElements.define('chat-widget', ChatWidget);
 }
 
-// TODO: update to new setup
 /**
  * Initializes the ChatWidget programmatically.
  *
