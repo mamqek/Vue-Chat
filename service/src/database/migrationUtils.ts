@@ -134,8 +134,6 @@ async function runMigrations(): Promise<void> {
 
         child.on("close", (code) => {
             if (code === 0) {
-                if (addedColumnsNames) {
-                    saveAddedUserColumns(addedColumnsNames).catch((error) => {
                         console.error("Error saving added user columns:", error);
                     });
                 }
