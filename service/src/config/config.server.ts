@@ -50,6 +50,7 @@ export interface MyEnvConfig {
     JWT_ALGORITHM?: string;
     sessionLookup: SessionLookupFn;
 
+    user_table_name: string;               // Name of the user table in the database
     user_entity: new (...args: any[]) => BaseUser;
     user_mapping: UserFieldMapping;
 }
@@ -85,6 +86,7 @@ const defaultConfig: MyEnvConfig = {
         throw new Error("sessionLookup function not implemented");
     },
 
+    user_table_name: "users",
     user_entity: DefaultUser, 
     user_mapping: {
         full_name: {
@@ -154,7 +156,7 @@ function mergeConfig(newConfig: Partial<MyEnvConfig>) {
         mergeFieldMapping(currentConfig.user_mapping);
         console.log("Generating CustomUser entity based on field mapping...");
         // Dynamically generate the CustomUser entity
-        const CustomUser = generateCustomUserClass(currentConfig.user_mapping);
+        const CustomUser = generateCustomUserClass(currentConfig.user_mapping, currentConfig.user_table_name);
         // Update the User entity in the configuration
         currentConfig.user_entity = CustomUser;
     } else {

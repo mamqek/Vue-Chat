@@ -8,6 +8,7 @@ import {
 import { isDefault, getConfigVariable, setConfig } from "../../config/config.server";
 import { promptUser } from "../dataSource";
 import { UserFieldMapping } from "../../types/UserConfig";
+import { get } from "http";
 
 
 export class UserMigration1680300000005 implements MigrationInterface {
@@ -16,14 +17,15 @@ export class UserMigration1680300000005 implements MigrationInterface {
 
         try {
             await queryRunner.startTransaction();
-
+            this.setUserConfig();
             const columns = this.buildUserTableColumns();
-            
+            const table_name = getConfigVariable("user_table_name");
+
             console.warn("Looking for existing User table.");
-            const table = await queryRunner.getTable("users");
+            const table = await queryRunner.getTable(table_name);
             if (!table) {
                 const userWantsToCreateUsersTable = await promptUser(
-                    `Table 'users' does not exist. It will be created with following columns: ${columns.map(col => col.name).join(", ")}. Is this correct? Press 'y' to proceed or 'n' if you want to change custom mapping (y/n): `
+                    `Table ${table_name} does not exist. It will be created with following columns: ${columns.map(col => col.name).join(", ")}. Is this correct? Press 'y' to proceed or 'n' if you want to change custom mapping (y/n): `
                 );
 
                 if (!userWantsToCreateUsersTable) {
@@ -32,7 +34,7 @@ export class UserMigration1680300000005 implements MigrationInterface {
 
                 await queryRunner.createTable(
                     new Table({
-                        name: "users",
+                        name: table_name,
                         columns: [
                             ...columns,
                         ],
@@ -42,7 +44,7 @@ export class UserMigration1680300000005 implements MigrationInterface {
 
                 addedColumns = columns.map(col => col.name).join(", ");
             } else {
-                console.warn("Table 'users' detected. Checking presence of required and provided columns.");
+                console.warn(`Table ${table_name} detected. Checking presence of required and provided columns.`);
 
                 // Check if the table has the required columns.
                 const columnNames = columns.map(col => col.name);
@@ -50,7 +52,7 @@ export class UserMigration1680300000005 implements MigrationInterface {
                 const columnsToAddNames = columnNames.filter(column => !existingColumnNames.includes(column));
 
                 if (columnsToAddNames.length > 0) {
-                    console.warn(`Missing columns in 'users' table: ${columnsToAddNames.join(", ")}`);
+                    console.warn(`Missing columns in ${table_name} table: ${columnsToAddNames.join(", ")}`);
 
                     const userWantsToAddColumns = await promptUser(
                         `Do you want to add these columns? Choose 'n' if you want to change custom mapping (y/n): `
@@ -60,7 +62,7 @@ export class UserMigration1680300000005 implements MigrationInterface {
                         throw new Error('Canceled to provide custom User entity. Exiting...');
                     } 
                 } else {
-                    console.warn("All required columns are present in the 'users' table. No changes needed.");
+                    console.warn(`All required columns are present in the ${table_name} table. No changes needed.`);
                     return;
                 }
 
@@ -74,7 +76,7 @@ export class UserMigration1680300000005 implements MigrationInterface {
                     .getRawOne(); // Execute the query and get the result
 
                 if (rowCount > 0) {
-                    console.log(`Table 'users' already has ${rowCount} records. Checking for default values or nullable columns.`);
+                    console.log(`Table ${table_name} already has ${rowCount} records. Checking for default values or nullable columns.`);
                     for (const column of columnsToAdd) {
                         // If there are records, for each column to be added, ensure it has a default or is nullable.
                         if (column.default === undefined && column.isNullable !== true) {
@@ -88,7 +90,7 @@ export class UserMigration1680300000005 implements MigrationInterface {
                 // Add missing columns to the table.
                 for (const column of columnsToAdd) {
                     await queryRunner.addColumn(
-                        "users",
+                        table_name,
                         new TableColumn(column),
                     );
                 }
@@ -108,9 +110,22 @@ export class UserMigration1680300000005 implements MigrationInterface {
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
-        const userTable = await queryRunner.getTable("users");
+        this.setUserConfig();
+
+        const migrationRecord = await this.userMigrationRecord(queryRunner);
+
+        const savedTableName = migrationRecord.table_name;
+
+        const configTableName = getConfigVariable("user_table_name");
+
+        if (savedTableName !== configTableName) {
+            console.warn(`Table name in migration record (${savedTableName}) does not match current config (${configTableName}). Skipping down migration.`);
+            return;
+        }
+
+        const userTable = await queryRunner.getTable(savedTableName);
         if (!userTable) {
-            console.warn("Table 'users' does not exist. Skipping down migration.");
+            console.warn(`Table ${savedTableName} does not exist. Skipping down migration.`);
             return;
         }
 
@@ -118,8 +133,6 @@ export class UserMigration1680300000005 implements MigrationInterface {
         
         try {
             // Try to get column information from the migration record
-            const migrationRecord = await this.userMigrationRecord(queryRunner);
-            
             if (migrationRecord.columns) {
                 columnToRemoveNames = migrationRecord.columns.split(",").map((col: string) => col.trim());
             } else {
@@ -145,9 +158,9 @@ export class UserMigration1680300000005 implements MigrationInterface {
 
         // If all columns in the 'users' table are marked for removal, drop the table.
         if (userTableColumnNames.every((colName) => columnToRemoveNames.includes(colName))) {
-            console.log("All columns in the 'users' table are marked for removal. Dropping the table...");
-            await queryRunner.dropTable("users");
-            console.log("Table 'users' dropped successfully.");
+            console.log(`All columns in the ${savedTableName} table are marked for removal. Dropping the table...`);
+            await queryRunner.dropTable(savedTableName);
+            console.log(`Table ${savedTableName} dropped successfully.`);
             return;
         }
         
@@ -155,8 +168,8 @@ export class UserMigration1680300000005 implements MigrationInterface {
         for (const colName of columnToRemoveNames) {
             const column = userTable.columns.find(c => c.name === colName);
             if (column) {
-                console.log(`Dropping column "${colName}" from 'users' table.`);
-                await queryRunner.dropColumn("users", colName);
+                console.log(`Dropping column "${colName}" from ${savedTableName} table.`);
+                await queryRunner.dropColumn(savedTableName, colName);
             }
         }
 
@@ -165,13 +178,6 @@ export class UserMigration1680300000005 implements MigrationInterface {
 
 
     private buildUserTableColumns() : TableColumnOptions[] {
-        // Even though config gets set by dataSourceRef right after command execution within runMigration(), its not present within this migration.
-        // So we need to set it again here. 
-        const ENVConfig = process.env.USER_CONFIG;
-        if (ENVConfig) {
-            setConfig(JSON.parse(ENVConfig));
-        }
-        
         if (!isDefault("user_mapping")) {
             console.warn("Custom mapping provided. Using custom User entity.");
         } else {
@@ -222,7 +228,15 @@ export class UserMigration1680300000005 implements MigrationInterface {
                 new TableColumn({
                     name: "columns",
                     type: "text",
-                    isNullable: true, // Make the column nullable
+                    isNullable: true,
+                })
+            );
+            await queryRunner.addColumn(
+                "chat_migrations",
+                new TableColumn({
+                    name: "table_name",
+                    type: "text",
+                    isNullable: true,
                 })
             );
         }
@@ -234,8 +248,8 @@ export class UserMigration1680300000005 implements MigrationInterface {
 
         // Store the information with all three values
         await queryRunner.query(
-            `INSERT INTO chat_migrations (name, timestamp, columns) VALUES (?, ?, ?)`,
-            [migrationName, timestamp, columnsAdded]
+            `INSERT INTO chat_migrations (name, timestamp, columns, table_name) VALUES (?, ?, ?)`,
+            [migrationName, timestamp, columnsAdded, getConfigVariable("user_table_name")],
         );
     }
 
@@ -249,6 +263,15 @@ export class UserMigration1680300000005 implements MigrationInterface {
             throw new Error(`No record found in 'chat_migrations' table with prefix '${migrationNamePrefix}'.`);
         }
         return records[0];
+    }
+
+    // Even though config gets set by dataSourceRef right after command execution within runMigration(), its not present within this migration.
+    // So we need to set it again here. 
+    setUserConfig() {
+        const ENVConfig = process.env.USER_CONFIG;
+        if (ENVConfig) {
+            setConfig(JSON.parse(ENVConfig));
+        }
     }
     
 }
