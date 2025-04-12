@@ -127,19 +127,36 @@ router.get('/chatWith/:user_id', async (req: AuthenticatedRequest, res: Response
 
 router.post('/login', async (req: Request, res: Response) => {
     const { user_id } = req.body;
+    
+    if (!user_id) {
+        return res.status(400).json({ error: 'user_id is required' });
+    }
 
-    const token = jwt.sign({ id: user_id }, getConfigVariable("TOKEN_SECRET"), { expiresIn: '1h' });
+    const token = jwt.sign(
+        { id: user_id },
+        getConfigVariable('TOKEN_SECRET'),
+        { 
+            algorithm: getConfigVariable('JWT_ALGORITHM') as jwt.Algorithm,
+            expiresIn: '24h'  // Token validity period
+        }
+    );
+
     res.cookie(getConfigVariable('TOKEN_NAME'), token, {
         httpOnly: true,
         secure: getConfigVariable('production'),
         sameSite: 'lax',
+        maxAge: 60 * 60 * 1000, // 1 hour
     });
 
     res.json({ success: true });
 });
 
 router.get('/user', (req: AuthenticatedRequest, res: Response) => {
-    res.json({ user: req.user });
+    if (!req.user) {
+        return res.status(401).json({ error: 'Not authenticated' });
+    }
+    
+    return res.json({ user: req.user });
 });
 
 export default router;

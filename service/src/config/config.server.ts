@@ -6,9 +6,6 @@ import { UserFieldMapping } from '../types/UserConfig';
 import { BaseUser } from '../entities/BaseUser';
 
 
-export type SessionLookupFn = (sessionId: string) => Promise<any>;
-
-
 export interface MyEnvConfig {
     production?: boolean;                  // Set to true in production environments
 
@@ -42,17 +39,34 @@ export interface MyEnvConfig {
     DB_PORT?: number;                      // For non-SQLite DBs
     DB_USER?: string;                      // For non-SQLite DBs
     DB_PASS?: string;                      // For non-SQLite DBs
-    synchronize?: boolean;                 // Automatically create database schema
     logging: false | LoggerOptions;          // Enable TypeORM logging
-
-    TOKEN_NAME: string;
-    TOKEN_SECRET: string;
-    JWT_ALGORITHM?: string;
-    sessionLookup: SessionLookupFn;
 
     user_table_name: string;               // Name of the user table in the database
     user_entity: new (...args: any[]) => BaseUser;
     user_mapping: UserFieldMapping;
+
+
+
+    // Authentication configuration
+    AUTH_MODE: 'direct' | 'auth-endpoint' | 'jwt' | 'custom' | 'proxy';
+
+    // Auth Endpoint Authentication
+    AUTH_ENDPOINT_URL: string;
+    
+    // JWT Authentication
+    TOKEN_NAME: string;                     // Cookie/header name for tokens
+    TOKEN_SECRET: string;                   // Secret for signing/verifying JWTs
+    JWT_ALGORITHM: string;                  // JWT algorithm (default "HS256")
+    JWT_USER_ID_FIELD: string;             // Field in JWT payload that contains user ID
+    
+    // Custom Authentication
+    customAuthFunction?: (req: Request) => Promise<{id: string | number, [key: string]: any}>;
+    
+    // Proxy Authentication
+    TRUSTED_PROXIES?: string[];             // List of trusted hostnames
+    PROXY_SECRET?: string;                  // Shared secret for proxy authentication
+    PROXY_USER_ID_SOURCE?: 'query' | 'body' | 'headers'; // Where to find user ID
+    PROXY_USER_ID_FIELD: string;           // Field name for user ID
 }
 
 // Define default values.
@@ -79,12 +93,6 @@ const defaultConfig: MyEnvConfig = {
     synchronize: false,
     logging: false,
     HOST: "0.0.0.0",
-    TOKEN_NAME: "chat_token",
-    TOKEN_SECRET: "chat-secret",
-    JWT_ALGORITHM: "HS256",
-    sessionLookup: async (sessionId: string) => {
-        throw new Error("sessionLookup function not implemented");
-    },
 
     user_table_name: "users",
     user_entity: DefaultUser, 
@@ -102,6 +110,25 @@ const defaultConfig: MyEnvConfig = {
             isNullable: true,
         },
     },
+
+
+
+    AUTH_MODE: 'direct',
+
+    // Auth Endpoint Authentication
+    AUTH_ENDPOINT_URL: '',
+    
+    // JWT defaults
+    TOKEN_NAME: "chat_token",
+    TOKEN_SECRET: "chat-secret-change-me-in-production",
+    JWT_ALGORITHM: "HS256",
+    JWT_USER_ID_FIELD: "id",
+    
+    // Proxy defaults
+    TRUSTED_PROXIES: [],
+    PROXY_USER_ID_SOURCE: 'body',
+    PROXY_USER_ID_FIELD: 'user_id',
+
 };
 
 let currentConfig: MyEnvConfig = { ...defaultConfig };
