@@ -4,11 +4,16 @@ import { getCommonConfig } from "../../config/config.common.js";
 
 // import { notify } from "@kyvg/vue3-notification";
 
-
-axios.defaults.xsrfCookieName = 'csrftoken'
-
+/**
+ * Axios instance used for making HTTP requests.
+ * Automatically attaches interceptors for request and response handling.
+ */
 let axiosInstance = createAxiosInstance();
 
+/**
+ * Creates a new Axios instance with the current configuration.
+ * @returns {import('axios').AxiosInstance} A new Axios instance.
+ */
 function createAxiosInstance() {
     const config = getCommonConfig();
     const instance = axios.create({
@@ -17,14 +22,17 @@ function createAxiosInstance() {
         withCredentials: true,
         headers: {
             'X-CSRF-TOKEN': 'dummy-dev-token',
-        }
+        },
     });
 
     attachInterceptors(instance);
-
     return instance;
 }
 
+/**
+ * Updates the Axios instance with the latest configuration.
+ * Useful when the configuration changes dynamically.
+ */
 export function updateAxiosInstance() {
     axiosInstance = createAxiosInstance();
 }
@@ -44,11 +52,11 @@ function attachInterceptors(instance) {
     instance.interceptors.response.use(
         response => {
             if (response?.data?.message) {
-                notify({
-                    type: "success",
-                    title: response.data?.status || "Success",
-                    text: response.data.message,
-                });
+                // notify({
+                //     type: "success",
+                //     title: response.data?.status || "Success",
+                //     text: response.data.message,
+                // });
             }
 
             return response

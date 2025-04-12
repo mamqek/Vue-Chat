@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { axios } from '../plugins/axios'
-import { socket } from '@/socketClient';
+import { socket, ensureSocketInitialized } from '@/socketClient';
 
 export const useChatStore = defineStore('chat', {
     state: () => ({
@@ -36,23 +36,28 @@ export const useChatStore = defineStore('chat', {
     actions: {
 
         async auth(user_id) {
-
-            if (user_id) {
-                // To create cookie with user_id, so service knows who is logged in
-                // console.log('Logging in with user_id:', user_id);
-                await axios.post("/login", { user_id })
-                .then(({ data }) => {
-                    this.init(user_id);
-                })
-            } else {
-                // To get user_id from cookie from developer's authentication flow
-                await axios.get("/user")
-                .then(({ data }) => {
-                    this.init(data.user.id);
-                })
+            try {
+                if (user_id) {
+                    // To create cookie with user_id, so service knows who is logged in
+                    // console.log('Logging in with user_id:', user_id);
+                    await axios.post("/login", { user_id })
+                    .then(({ data }) => {
+                        this.init(user_id);
+                    })
+                } else {
+                    // To get user_id from cookie from developer's authentication flow
+                    await axios.get("/user")
+                    .then(({ data }) => {
+                        if (data.user && data.user.id) {
+                            this.init(data.user.id);
+                        } else {
+                            console.error("Authentication failed: User ID not found");
+                        }
+                    })
+                }
+            } catch (error) {
+                console.error("Authentication error:", error);
             }
-
-            return
         },
 
         init(user_id) {
@@ -61,6 +66,8 @@ export const useChatStore = defineStore('chat', {
             
             if (!this.chatsLoaded) this.fetchChats();
             this.user_id = user_id;
+
+            ensureSocketInitialized();
             this.joinReceivingChannel(user_id);
             this.joinOnlineStatusChannel();
         },
