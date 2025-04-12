@@ -18,7 +18,7 @@ import { visualizer } from 'rollup-plugin-visualizer'
 export default defineConfig(({ command }) => ({
     build: {
         lib: {
-            entry: 'components/ChatWidget.js',
+            entry: 'widgets/ChatWidget.js',
             name: 'ChatWidget',
             fileName: 'chat-widget',
             formats: ["es", "umd"],
