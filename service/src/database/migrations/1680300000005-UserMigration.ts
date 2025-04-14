@@ -8,7 +8,6 @@ import {
 import { isDefault, getConfigVariable, setConfig } from "../../config/config.server";
 import { promptUser } from "../dataSource";
 import { UserFieldMapping } from "../../types/UserConfig";
-import { get } from "http";
 
 
 export class UserMigration1680300000005 implements MigrationInterface {
@@ -220,9 +219,8 @@ export class UserMigration1680300000005 implements MigrationInterface {
             throw new Error("Table 'chat_migrations' does not exist. Cannot store column information.");
         }
 
-        // Check if the `columns` column exists in the `chat_migrations` table
-        const columnExists = table?.columns.some((col) => col.name === "columns");
-        if (!columnExists) {
+        // Check if the `columns` and 'table_name' column exists in the `chat_migrations` table
+        if (!table?.columns.some((col) => col.name === "columns")) {
             await queryRunner.addColumn(
                 "chat_migrations",
                 new TableColumn({
@@ -231,6 +229,8 @@ export class UserMigration1680300000005 implements MigrationInterface {
                     isNullable: true,
                 })
             );
+        }
+        if (!table.columns.some((col) => col.name === "table_name")) {
             await queryRunner.addColumn(
                 "chat_migrations",
                 new TableColumn({
@@ -248,12 +248,12 @@ export class UserMigration1680300000005 implements MigrationInterface {
 
         // Store the information with all three values
         await queryRunner.query(
-            `INSERT INTO chat_migrations (name, timestamp, columns, table_name) VALUES (?, ?, ?)`,
+            `INSERT INTO chat_migrations (name, timestamp, columns, table_name) VALUES (?, ?, ?, ?)`,
             [migrationName, timestamp, columnsAdded, getConfigVariable("user_table_name")],
         );
     }
 
-    async userMigrationRecord( queryRunner: QueryRunner): Promise<any> { 
+    async userMigrationRecord(queryRunner: QueryRunner): Promise<any> { 
         const migrationNamePrefix = "UserMigration%"; 
         const records = await queryRunner.query(
             `SELECT * FROM chat_migrations WHERE name LIKE ?`,
