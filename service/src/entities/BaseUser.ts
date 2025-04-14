@@ -43,7 +43,6 @@ export abstract class BaseUser {
     abstract get full_name(): string;
     abstract get avatar(): string;
     abstract get bio(): string;
-
     abstract set full_name(value: string);
     abstract set avatar(value: string);
     abstract set bio(value: string);
@@ -52,10 +51,10 @@ export abstract class BaseUser {
     // So full_name, avatar, and bio are present on the frontend
     toJSON() {
         return {
-            ...this, // Include all existing properties
-            full_name: this.full_name, // Explicitly include the getter
-            avatar: this.avatar,       // Explicitly include the getter
-            bio: this.bio,             // Explicitly include the getter
+            ...this,
+            full_name: this.full_name,
+            avatar: this.avatar,    
+            bio: this.bio,    
         };
     }
 }

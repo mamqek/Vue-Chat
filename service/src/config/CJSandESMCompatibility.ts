@@ -9,7 +9,7 @@ const isCommonJS: boolean = typeof __dirname !== 'undefined';
 
 if (!global.__dirname) {
     if (!isCommonJS) {
-          try {
+        try {
             const __filename = fileURLToPath(import.meta.url);
             global.__dirname = path.dirname(__filename);
         } catch (error) {

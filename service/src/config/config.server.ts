@@ -7,45 +7,38 @@ import { BaseUser } from '../entities/BaseUser';
 
 
 export interface MyEnvConfig {
-    production?: boolean;                  // Set to true in production environments
+    // Environment
+    production?: boolean;
 
-    /**
-     * PORT: The port your service listens on (e.g., 4000).
-     */
+
+    // Connection 
     PORT?: number;
-    /**
-     * HOST: The network interface to bind to.
-     * "127.0.0.1" restricts access to local requests,
-     * while "0.0.0.0" accepts external connections.
-     */
     HOST: string;
-    /**
-     * SERVICE_URL: The external URL for your service (e.g., "https://website.com").
-     * Used for generating absolute links and configuring CORS.
-     */
     SERVICE_URL: string;     
+    CORS_ORIGIN?: Array<string>;
     
-    CORS_ORIGIN?: Array<string>;                   // The URL to allow CORS requests from
-    
+
+    // Chat service
     UPLOAD_URL: string;
     UPLOAD_DIR: string;
-    user_filter?: string | Record<string, any>; // f.e '{"active": true, "role": "admin"}' as sting or { active: true, role: 'admin' } as object
+    user_filter?: string | Record<string, any>;
     
-    // Database configuration
-    DB_PATH: string;                       // Path to SQLite database file
-    DB_URL?: string;                      // URL for non-SQLite databases
-    DB_TYPE: 'sqlite' | 'mysql' | 'postgres';
-    DB_NAME: string;                       // Database name or file name (for SQLite)
-    DB_HOST?: string;                      // For non-SQLite DBs
-    DB_PORT?: number;                      // For non-SQLite DBs
-    DB_USER?: string;                      // For non-SQLite DBs
-    DB_PASS?: string;                      // For non-SQLite DBs
-    logging: false | LoggerOptions;          // Enable TypeORM logging
 
-    user_table_name: string;               // Name of the user table in the database
+    // Database
+    DB_PATH: string;
+    DB_URL?: string;
+    DB_TYPE: 'sqlite' | 'mysql' | 'postgres';
+    DB_NAME: string;
+    DB_HOST?: string;
+    DB_PORT?: number;
+    DB_USER?: string;
+    DB_PASS?: string;
+    logging: false | LoggerOptions;
+
+    // User entity 
+    user_table_name: string;
     user_entity: new (...args: any[]) => BaseUser;
     user_mapping: UserFieldMapping;
-
 
 
     // Authentication configuration
@@ -55,24 +48,23 @@ export interface MyEnvConfig {
     AUTH_ENDPOINT_URL: string;
     
     // JWT Authentication
-    TOKEN_NAME: string;                     // Cookie/header name for tokens
-    TOKEN_SECRET: string;                   // Secret for signing/verifying JWTs
-    JWT_ALGORITHM: string;                  // JWT algorithm (default "HS256")
-    JWT_USER_ID_FIELD: string;             // Field in JWT payload that contains user ID
+    TOKEN_NAME: string;
+    TOKEN_SECRET: string;
+    JWT_ALGORITHM: string;
+    JWT_USER_ID_FIELD: string;
     
     // Custom Authentication
     customAuthFunction?: (req: Request) => Promise<{id: string | number, [key: string]: any}>;
     
     // Proxy Authentication
-    TRUSTED_PROXIES?: string[];             // List of trusted hostnames
-    PROXY_SECRET?: string;                  // Shared secret for proxy authentication
-    PROXY_USER_ID_SOURCE?: 'query' | 'body' | 'headers'; // Where to find user ID
-    PROXY_USER_ID_FIELD: string;           // Field name for user ID
+    TRUSTED_PROXIES?: string[];
+    PROXY_SECRET?: string;
+    PROXY_USER_ID_SOURCE?: 'query' | 'body' | 'headers'; 
+    PROXY_USER_ID_FIELD: string; 
 }
 
-// Define default values.
 const defaultConfig: MyEnvConfig = {
-    production: global.__dirname.includes('dist'), // Set to true in production environments, based on the directory name
+    production: global.__dirname.includes('dist'),
 
     PORT: 4000,
     SERVICE_URL: "http://localhost:4000",
@@ -88,10 +80,10 @@ const defaultConfig: MyEnvConfig = {
     DB_PATH: '../src/database/chatdb.sqlite',
     DB_TYPE: "sqlite",
     DB_NAME: "chatdb",
-    DB_HOST: "",          // Not used for SQLite; override for Postgres/MySQL
-    DB_PORT: undefined,   // Not used for SQLite; override for Postgres/MySQL
-    DB_USER: "",          // Not used for SQLite; override for Postgres/MySQL
-    DB_PASS: "",          // Not used for SQLite; override for Postgres/MySQL
+    DB_HOST: "",
+    DB_PORT: undefined,
+    DB_USER: "",
+    DB_PASS: "",
     logging: false,
 
     user_table_name: "users",
@@ -112,7 +104,6 @@ const defaultConfig: MyEnvConfig = {
     },
 
 
-
     AUTH_MODE: 'direct',
 
     // Auth Endpoint Authentication
@@ -128,7 +119,6 @@ const defaultConfig: MyEnvConfig = {
     TRUSTED_PROXIES: [],
     PROXY_USER_ID_SOURCE: 'body',
     PROXY_USER_ID_FIELD: 'user_id',
-
 };
 
 let currentConfig: MyEnvConfig = { ...defaultConfig };
@@ -204,9 +194,8 @@ function mergeFieldMapping(customMapping: UserFieldMapping): void {
     currentConfig.user_mapping = mergedMapping;
 }
 
-// Validate required or mutually-exclusive configuration.
-function validateConfig(config: Partial<MyEnvConfig>): void {
 
+function validateConfig(config: Partial<MyEnvConfig>): void {
     // Check if keys in field_mapping are valid
     if (config.user_mapping) {
         const mapping = config.user_mapping;

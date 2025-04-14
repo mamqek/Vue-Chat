@@ -48,7 +48,7 @@ export class ChatMessageMigration1680300000001 implements MigrationInterface {
                     },
                     {
                         name: "attachment",
-                        type: "text", // simple-json is stored as text
+                        type: "text",
                         isNullable: true,
                     },
                     {
@@ -71,7 +71,6 @@ export class ChatMessageMigration1680300000001 implements MigrationInterface {
             true,
         );
 
-        // Create indices.
         await queryRunner.createIndex(
             "chat_messages",
             new TableIndex({
@@ -87,7 +86,6 @@ export class ChatMessageMigration1680300000001 implements MigrationInterface {
             }),
         );
 
-        // Foreign key: chat_id references chats.
         await queryRunner.createForeignKey(
             "chat_messages",
             new TableForeignKey({
@@ -97,8 +95,6 @@ export class ChatMessageMigration1680300000001 implements MigrationInterface {
                 onDelete: "CASCADE",
             }),
         );
-
-        // Self-referencing foreign key: replied_to references chat_messages.
         await queryRunner.createForeignKey(
             "chat_messages",
             new TableForeignKey({
@@ -120,7 +116,6 @@ export class ChatMessageMigration1680300000001 implements MigrationInterface {
             return;
         }
 
-        // Drop self-referencing foreign key for replied_to.
         const fkRepliedTo = table.foreignKeys.find(
             (fk) =>
                 fk.columnNames.indexOf("replied_to") !== -1 &&
@@ -130,7 +125,6 @@ export class ChatMessageMigration1680300000001 implements MigrationInterface {
             await queryRunner.dropForeignKey("chat_messages", fkRepliedTo);
         }
 
-        // Drop foreign key for chat_id.
         const fkChat = table.foreignKeys.find(
             (fk) => fk.columnNames.indexOf("chat_id") !== -1,
         );
@@ -138,11 +132,8 @@ export class ChatMessageMigration1680300000001 implements MigrationInterface {
             await queryRunner.dropForeignKey("chat_messages", fkChat);
         }
 
-        // Drop indices.
         await queryRunner.dropIndex("chat_messages", "IDX_CHAT_MESSAGE_CHAT");
         await queryRunner.dropIndex("chat_messages", "IDX_CHAT_MESSAGE_REPLIED_TO");
-
-        // Drop the table.
         await queryRunner.dropTable("chat_messages");
 
         console.log("Revert migration for ChatMessage table completed successfully.");

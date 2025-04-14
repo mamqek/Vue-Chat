@@ -1,4 +1,3 @@
-// src/entities/ChatMessageStatus.ts
 import {
     Entity,
     PrimaryColumn,

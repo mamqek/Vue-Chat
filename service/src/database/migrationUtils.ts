@@ -3,8 +3,6 @@
 import { builtFileExtension, isCommonJS } from "../config/CJSandESMCompatibility";
 import { fileURLToPath } from 'url';
 
-// TODO: allow passing databse path as argument
-
 let runMain = false;
 if (isCommonJS) {
     runMain = (require.main === module);
@@ -20,8 +18,7 @@ if (isCommonJS) {
 }
 
 if (runMain) {
-    // Add support for passing database path as a command-line argument
-    const args = process.argv.slice(2); // Get command-line arguments (excluding "node" and the script path)
+    const args = process.argv.slice(2); 
 
     // Check if a database path is provided
     const dbPathIndex = args.indexOf("--db-path");
@@ -48,7 +45,7 @@ if (runMain) {
 import path from "path";
 import { getConfig, setConfigVariable } from "../config/config.server";
 import { spawn, exec } from "child_process";
-import { promptUser } from "./dataSource";
+import { promptUser } from "../helper"
 
 // Wrap the exec commands in a Promise so program waits for it to finish
 
@@ -125,24 +122,20 @@ async function runMigrations(): Promise<void> {
         // Use spawn here as it might be interactive prompt 
         const child = spawn("npx.cmd", ["typeorm", "migration:run", "-d", dataSourcePath], {
             env: { ...process.env, USER_CONFIG },
-            stdio: ['inherit', 'pipe', 'pipe'], // Capture stdout and stderr
+            stdio: ['inherit', 'pipe', 'pipe'],
         });
-
         let migrationsCompleted = 0;
         child.stdout.on("data", (data) => {
             const output = data.toString();
-            
             // Track migration progress
             if (output.includes("Migration for")) {
-                console.log(output); // Log the output to the console
+                console.log(output);
                 migrationsCompleted++;
             }
         });
-
         child.stderr.on("data", (data) => {
             console.error(data.toString());
         });
-
         child.on("close", (code) => {
             if (code === 0) {
                 if (migrationsCompleted === 0) {
@@ -155,7 +148,6 @@ async function runMigrations(): Promise<void> {
                 reject(new Error(`Migration process exited with code ${code}`));
             }
         });
-
         child.on("error", (error) => {
             console.error(`Error running migrations: ${error.message}`);
             reject(error);
@@ -176,18 +168,15 @@ export async function revertMigrations(): Promise<void> {
             env: { ...process.env, USER_CONFIG },
             stdio: ['inherit', 'pipe', 'pipe'], // Capture stdout and stderr
         });
-
         child.stdout.on("data", (data) => {
             if (data.toString().includes("Revert migration")) {
                 console.log(data.toString()); // Log the output to the console
                 migrationsCompleted++;
             }
         });
-
         child.stderr.on("data", (data) => {
             console.error(data.toString());
         });
-
         child.on("close", (code) => {
             if (code === 0) {
                 if (migrationsCompleted === 0) {
@@ -200,7 +189,6 @@ export async function revertMigrations(): Promise<void> {
                 reject(new Error(`Revert process exited with code ${code}`));
             }
         });
-
         child.on("error", (error) => {
             console.error(`Error running reverts: ${error.message}`);
             reject(error);
@@ -211,14 +199,13 @@ export async function revertMigrations(): Promise<void> {
         const runAgain = await promptUser(
             `Do you want to revert next migration? (y/n): `
         );
-
+        
         if (runAgain) {
             await revertMigrations();
         } else {
             console.log("Migration process completed. Exiting...");
         }
     }
-
 }
 
 

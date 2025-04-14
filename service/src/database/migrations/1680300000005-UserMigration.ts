@@ -6,7 +6,7 @@ import {
     TableColumnOptions,
 } from "typeorm";
 import { isDefault, getConfigVariable, setConfig } from "../../config/config.server";
-import { promptUser } from "../dataSource";
+import { promptUser } from "../../helper";
 import { UserFieldMapping } from "../../types/UserConfig";
 
 
@@ -70,14 +70,12 @@ export class UserMigration1680300000005 implements MigrationInterface {
                 // Check if the table already has records.
                 const rowCount = await queryRunner.manager
                     .createQueryBuilder()
-                    .select("COUNT(*)", "count") // Select the count of rows
-                    .from(table.name, "t") // Use the table name dynamically
-                    .getRawOne(); // Execute the query and get the result
-
+                    .select("COUNT(*)", "count")
+                    .from(table.name, "t")
+                    .getRawOne();
                 if (rowCount > 0) {
                     console.log(`Table ${table_name} already has ${rowCount} records. Checking for default values or nullable columns.`);
                     for (const column of columnsToAdd) {
-                        // If there are records, for each column to be added, ensure it has a default or is nullable.
                         if (column.default === undefined && column.isNullable !== true) {
                             throw new Error(
                                 `Cannot add column "${column.name}" to a non-empty table without a default value or nullable flag.`
@@ -86,7 +84,6 @@ export class UserMigration1680300000005 implements MigrationInterface {
                     }
                 }
 
-                // Add missing columns to the table.
                 for (const column of columnsToAdd) {
                     await queryRunner.addColumn(
                         table_name,
@@ -112,9 +109,7 @@ export class UserMigration1680300000005 implements MigrationInterface {
         this.setUserConfig();
 
         const migrationRecord = await this.userMigrationRecord(queryRunner);
-
         const savedTableName = migrationRecord.table_name;
-
         const configTableName = getConfigVariable("user_table_name");
 
         if (savedTableName !== configTableName) {
@@ -129,9 +124,7 @@ export class UserMigration1680300000005 implements MigrationInterface {
         }
 
         let columnToRemoveNames: string[] = [];
-        
         try {
-            // Try to get column information from the migration record
             if (migrationRecord.columns) {
                 columnToRemoveNames = migrationRecord.columns.split(",").map((col: string) => col.trim());
             } else {
@@ -163,7 +156,6 @@ export class UserMigration1680300000005 implements MigrationInterface {
             return;
         }
         
-        // Otherwise, drop only the specified columns.
         for (const colName of columnToRemoveNames) {
             const column = userTable.columns.find(c => c.name === colName);
             if (column) {
@@ -184,7 +176,6 @@ export class UserMigration1680300000005 implements MigrationInterface {
         }
 
         const mapping: UserFieldMapping = getConfigVariable("user_mapping");
-
         const columns: TableColumnOptions[] = Object.values(mapping).map(column =>
             ({ ...column, type: "text" })
         );
@@ -212,14 +203,14 @@ export class UserMigration1680300000005 implements MigrationInterface {
         return columns;
     }
 
+    // Store columns added and table name while migration to chat_migrations table.
+    // Its required to clean revert migration, even if user changed something in the config 
     private async storeColumnInformation(queryRunner: QueryRunner, columnsAdded: string): Promise<void> {
-        // Check if the `chat_migrations` table exists
         const table = await queryRunner.getTable("chat_migrations");
         if (!table) {
             throw new Error("Table 'chat_migrations' does not exist. Cannot store column information.");
         }
 
-        // Check if the `columns` and 'table_name' column exists in the `chat_migrations` table
         if (!table?.columns.some((col) => col.name === "columns")) {
             await queryRunner.addColumn(
                 "chat_migrations",
@@ -241,12 +232,9 @@ export class UserMigration1680300000005 implements MigrationInterface {
             );
         }
 
-        // Get correct migration name from class
         const migrationName = this.constructor.name;
-        // Extract timestamp from class name (assuming format UserMigration1680300000005)
         const timestamp = migrationName.match(/\d+$/)?.[0] || Date.now().toString();
 
-        // Store the information with all three values
         await queryRunner.query(
             `INSERT INTO chat_migrations (name, timestamp, columns, table_name) VALUES (?, ?, ?, ?)`,
             [migrationName, timestamp, columnsAdded, getConfigVariable("user_table_name")],

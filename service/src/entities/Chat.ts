@@ -1,4 +1,3 @@
-// src/entities/Chat.ts
 import {
     Entity,
     PrimaryGeneratedColumn,
@@ -49,16 +48,13 @@ export class Chat {
     @UpdateDateColumn()
     updated_at!: Date;
 
-    // One chat has many messages.
     @OneToMany(() => ChatMessage, (message) => message.chat)
     messages!: ChatMessage[];
 
-    // Getter to support legacy backend code that expects a numeric user1_id field.
+    // Getter to support legacy backend code that expects a numeric user1_id and user2_id.
     get user1_id(): number {
         return this.user1?.id;
     }
-
-    // Similarly for user2_id.
     get user2_id(): number {
         return this.user2?.id;
     }

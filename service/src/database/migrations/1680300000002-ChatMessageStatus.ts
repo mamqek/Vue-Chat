@@ -29,7 +29,7 @@ export class ChatMessageStatusMigration1680300000002 implements MigrationInterfa
                     {
                         name: "status",
                         type: "text",
-                        default: "'sent'", // default value (adjust quoting as needed)
+                        default: "'sent'",
                     },
                     {
                         name: "created_at",
@@ -46,7 +46,6 @@ export class ChatMessageStatusMigration1680300000002 implements MigrationInterfa
             true,
         );
 
-        // Foreign key: message_id references chat_messages.
         await queryRunner.createForeignKey(
             "chat_message_statuses",
             new TableForeignKey({

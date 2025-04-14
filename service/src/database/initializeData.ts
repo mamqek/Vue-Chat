@@ -1,4 +1,3 @@
-// service/src/initializeData.ts
 import { AppDataSource } from './dataSource';
 import { Chat } from '../entities/Chat';
 import { getConfigVariable } from '../config/config.server';
@@ -42,10 +41,10 @@ export async function initializeData() {
 }
 
 function createCustomUser(data: Partial<BaseUser>): BaseUser {
-    const UserConstructor = getConfigVariable("user_entity"); // no parentheses
+    const UserConstructor = getConfigVariable("user_entity");
     const user = new UserConstructor();
-    if (data.full_name) user.full_name = data.full_name; // Invokes the setter
-    if (data.bio) user.bio = data.bio; // Invokes the setter
+    if (data.full_name) user.full_name = data.full_name;
+    if (data.bio) user.bio = data.bio;
     if (data.avatar) user.avatar = data.avatar;
     return user;
 }
