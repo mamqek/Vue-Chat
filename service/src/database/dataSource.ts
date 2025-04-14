@@ -7,19 +7,18 @@ import { ChatMessageStatus } from '../entities/ChatMessageStatus';
 
 import path from 'path';
 import { getConfig } from '../config/config.server';
-
 import readline from 'readline';
 
 export let AppDataSource: DataSource;
 
-export async function initDatasource() {
+export async function initDatasource(): Promise<DataSource> {
     const config = getConfig();
 
     const database = config.DB_TYPE === 'sqlite' ? config.DB_PATH : config.DB_NAME;
 
     const dataSourceOptions: DataSourceOptions = 
     {
-        type: config.DB_TYPE as 'sqlite' | 'postgres' | 'mysql',
+        type: config.DB_TYPE,
         database: database,
         entities: [
             Chat, 
@@ -27,7 +26,7 @@ export async function initDatasource() {
             ChatMessageStatus, 
             config.user_entity
         ],
-        synchronize: config.synchronize,
+        ...(config.DB_URL ? { url: config.DB_URL } : {}),
         dropSchema: false,
 
         migrationsTableName: 'chat_migrations', 
@@ -39,11 +38,12 @@ export async function initDatasource() {
         port: config.DB_PORT,
         username: config.DB_USER,
         password: config.DB_PASS,
+        
     };
 
     AppDataSource = new DataSource(dataSourceOptions);
     await AppDataSource.initialize();
-    console.log('Data Source has been initialized!', path.resolve(process.cwd(), database));
+    console.warn('Data Source has been initialized!', path.resolve(process.cwd(), database));
 
     // Create the 'users' table if it doesn't exist
     await createUsersTable();

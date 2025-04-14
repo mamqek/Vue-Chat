@@ -33,6 +33,7 @@ export interface MyEnvConfig {
     
     // Database configuration
     DB_PATH: string;                       // Path to SQLite database file
+    DB_URL?: string;                      // URL for non-SQLite databases
     DB_TYPE: 'sqlite' | 'mysql' | 'postgres';
     DB_NAME: string;                       // Database name or file name (for SQLite)
     DB_HOST?: string;                      // For non-SQLite DBs
@@ -75,6 +76,7 @@ const defaultConfig: MyEnvConfig = {
 
     PORT: 4000,
     SERVICE_URL: "http://localhost:4000",
+    HOST: "0.0.0.0",
     
     UPLOAD_DIR: 'uploads',
     UPLOAD_URL: "uploads",
@@ -90,9 +92,7 @@ const defaultConfig: MyEnvConfig = {
     DB_PORT: undefined,   // Not used for SQLite; override for Postgres/MySQL
     DB_USER: "",          // Not used for SQLite; override for Postgres/MySQL
     DB_PASS: "",          // Not used for SQLite; override for Postgres/MySQL
-    synchronize: false,
     logging: false,
-    HOST: "0.0.0.0",
 
     user_table_name: "users",
     user_entity: DefaultUser, 
