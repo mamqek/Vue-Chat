@@ -71,7 +71,7 @@ export interface MyEnvConfig {
 
 // Define default values.
 const defaultConfig: MyEnvConfig = {
-    production: __dirname.includes('dist'), // Set to true in production environments, based on the directory name
+    production: global.__dirname.includes('dist'), // Set to true in production environments, based on the directory name
 
     PORT: 4000,
     SERVICE_URL: "http://localhost:4000",

@@ -4,13 +4,16 @@
     "private": true,
     "exports": {
         "./service": {
-            "require": "./service/dist/exports.js",
-            "import": "./service/dist/exports.mjs"
+            "require": "./service/dist/exports.cjs",
+            "import": "./service/dist/exports.js"
         },
         ".": {
             "require": "./src/dist/chat-widget.umd.js",
             "import": "./src/dist/chat-widget.mjs"
         }
+    },
+    "bin": {
+        "migrations": "./service/dist/migrationUtils.js"
     },
     "scripts": {
         "start": "node service/dist/index.js",

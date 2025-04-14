@@ -30,8 +30,8 @@ export async function initDatasource() {
         synchronize: config.synchronize,
         dropSchema: false,
 
-        migrations: [path.resolve(__dirname, '../dist/migrations/*.js')], 
         migrationsTableName: 'chat_migrations', 
+        migrations: [path.resolve(global.__dirname, `../dist/migrations/*.cjs`)],
 
         // use SimpleConsoleLogger for logging, as even with logging: false, normal one shows logs
         logger: new SimpleConsoleLogger(config.logging as any),

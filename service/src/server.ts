@@ -1,3 +1,6 @@
+// load __dirname resolution
+import './config/CJSandESMCompatibility';
+
 import { initDatasource } from './database/dataSource';
 import { DataSource } from 'typeorm';
 

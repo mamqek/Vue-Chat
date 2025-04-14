@@ -1,3 +1,4 @@
+import '../config/CJSandESMCompatibility';
 import { setConfig } from "../config/config.server";
 import { AppDataSource, initDatasource } from "./dataSource";
 

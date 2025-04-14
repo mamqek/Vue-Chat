@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 // TODO: allow passing databse path as argument 
+import { builtFileExtension, isCommonJS } from "../config/CJSandESMCompatibility";
 
 if (require.main === module) {
     const args = process.argv.slice(2); // Get command-line arguments (excluding "node" and the script path)
@@ -26,12 +27,9 @@ if (require.main === module) {
 }
 
 import path from "path";
-import { getConfig } from "../config/config.server";
+import { getConfig, setConfigVariable } from "../config/config.server";
 import { spawn, exec } from "child_process";
-import { AppDataSource, promptUser } from "./dataSource";
-import { TableColumn } from "typeorm";
-
-
+import { promptUser } from "./dataSource";
 
 // Wrap the exec commands in a Promise so program waits for it to finish
 
@@ -46,15 +44,16 @@ export async function handleMigrations(): Promise<void> {
 }
 
 async function buildMigrations(): Promise<void> {
-    const migrationsDir = path.resolve(__dirname,  `../src/database/migrations/*`);
-    const buildMigrationsDir = path.resolve(__dirname, "../dist/migrations");
+    const migrationsDir = path.resolve(global.__dirname,  `../src/database/migrations/*`);
+    const buildMigrationsDir = path.resolve(global.__dirname, "../dist/migrations");
 
-    const command = `npx tsup ${migrationsDir} --format cjs,esm --dts --out-dir ${buildMigrationsDir}`;
+    // Migrations don't need to be built in ESM because TypeORM is stupid and cant handle it
+    const command = `npx tsup ${migrationsDir} --format cjs --dts --out-dir ${buildMigrationsDir}`;
 
     // Execute command in the directory of service so tsup is available
-    const serviceDir = path.resolve(__dirname, "../");
+    const serviceDir = path.resolve(global.__dirname, "../");
     return new Promise((resolve, reject) => {
-        exec(command, { cwd: serviceDir }, (error, stdout, stderr) => {
+        exec(command, { cwd: serviceDir }, (error, _, stderr) => {
             if (error) {
                 console.error(`Error building migrations: ${error.message}`);
                 reject(error); 
@@ -72,16 +71,15 @@ async function buildMigrations(): Promise<void> {
 }
 
 async function buildDataSource(): Promise<void> {
-    console.log(`Building datasource`);
-    const dataSourcePath = path.resolve(__dirname, "../src/database/dataSourceRef.ts");
-    const distDir = path.resolve(__dirname, "../dist");
+    const dataSourcePath = path.resolve(global.__dirname, "../src/database/dataSourceRef.ts");
+    const distDir = path.resolve(global.__dirname, "../dist");
 
     const command = `npx tsup ${dataSourcePath} --format cjs,esm --dts --out-dir ${distDir}`;
     
     // Execute command in the directory of service so tsup is available
-    const serviceDir = path.resolve(__dirname, "../");
+    const serviceDir = path.resolve(global.__dirname, "../");
     return new Promise((resolve, reject) => {
-        exec(command, { cwd: serviceDir }, (error, stdout, stderr) => {
+        exec(command, { cwd: serviceDir }, (error, _, stderr) => {
             if (error) {
                 console.error(`Error compiling datasource: ${error.message}`);
                 reject(error);
@@ -100,7 +98,7 @@ async function buildDataSource(): Promise<void> {
 
 async function runMigrations(): Promise<void> {
     console.log("Running migrations...");
-    const dataSourcePath = path.resolve(__dirname, "../dist/dataSourceRef.js");
+    const dataSourcePath = path.resolve(global.__dirname, `../dist/dataSourceRef.${builtFileExtension}`);
 
     // Add User_Config to ENV so spawned process has access to config developer provided (needed for User migration)
     const USER_CONFIG = JSON.stringify(getConfig());
@@ -148,7 +146,7 @@ async function runMigrations(): Promise<void> {
 
 export async function revertMigrations(): Promise<void> {
     console.log("Reverting migrations...");
-    const dataSourcePath = path.resolve(__dirname, "../dist/dataSourceRef.js");
+    const dataSourcePath = path.resolve(global.__dirname, `../dist/dataSourceRef.${builtFileExtension}`);
     
     // Add User_Config to ENV so spawned process has access to config developer provided (needed for User migration)
     const USER_CONFIG = JSON.stringify(getConfig());
