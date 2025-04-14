@@ -1,18 +1,37 @@
 #!/usr/bin/env node
 
-// TODO: allow passing databse path as argument 
 import { builtFileExtension, isCommonJS } from "../config/CJSandESMCompatibility";
+import { fileURLToPath } from 'url';
 
-if (require.main === module) {
+// TODO: allow passing databse path as argument
+
+let runMain = false;
+if (isCommonJS) {
+    runMain = (require.main === module);
+} else {
+    try {
+        const __filename = fileURLToPath(import.meta.url);
+        const entryBase = path.basename(process.argv[1]);
+        const currentBase = path.basename(__filename);
+        runMain = (entryBase === currentBase);
+    } catch (error) {
+        console.error("Error in ESM path resolution utils:", error);
+    }
+}
+
+if (runMain) {
+    // Add support for passing database path as a command-line argument
     const args = process.argv.slice(2); // Get command-line arguments (excluding "node" and the script path)
 
-    if (args.includes("--run")) {
-        try {
-            runMigrations();
-        } catch (error) {
-            console.error("Migration running failed:", error);
-        }
-    } else if (args.includes("--revert")) {
+    // Check if a database path is provided
+    const dbPathIndex = args.indexOf("--db-path");
+    if (dbPathIndex !== -1 && args[dbPathIndex + 1]) {
+        const dbPath = args[dbPathIndex + 1];
+        setConfigVariable("DB_PATH", dbPath);
+        console.log(`Database path set to: ${dbPath}`);
+    }
+
+    if (args.includes("--revert")) {
         try {
             revertMigrations();
         } catch (error) {
