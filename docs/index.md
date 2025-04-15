@@ -1,6 +1,6 @@
-# Vue-Chat
+# AIOChatWC 
 
-Vue-Chat is a highly configurable chat solution that includes a web component for embedding chat functionality into your frontend and a backend service for managing chat logic, authentication, and database interactions.
+AIOChatWC or in other words All in one chat web component is a highly configurable chat solution that includes a web component for embedding chat functionality into your frontend and a backend service for managing chat logic, authentication, and database interactions.
 
 ## Features
 
@@ -16,7 +16,7 @@ Vue-Chat is a highly configurable chat solution that includes a web component fo
 
 The documentation is divided into two main sections:
 
-1. **[Web Component](./docs/web-component/index.md)**: Learn how to set up and configure the Vue-Chat web component.
+1. **[Web Component](./docs/web-component/index.md)**: Learn how to set up and configure the AIOChatWC web component.
 2. **[Service](./docs/service/index.md)**: Understand the backend service, its configuration, and customization options.
 
 ---
@@ -28,7 +28,7 @@ The documentation is divided into two main sections:
 Install the package:
 
 ```bash
-npm install vue-chat
+npm install aio-chat-wc
 ```
 
 Also, ensure Vue.js is installed in your project:
@@ -37,10 +37,9 @@ Also, ensure Vue.js is installed in your project:
 npm install vue
 ```
 
-
 ## Web Component
 
-The Vue-Chat web component allows you to embed a chat widget into your application. It supports two ways to initialize:
+The AIOChatWC web component allows you to embed a chat widget into your application. It supports two ways to initialize:
 
 1. **Using the `<chat-widget>` HTML Element**:
    ```html
@@ -49,7 +48,7 @@ The Vue-Chat web component allows you to embed a chat widget into your applicati
 
 2. **Using the `initChatWidget` Function**:
    ```javascript
-   import { initChatWidget } from 'vue-chat';
+   import { initChatWidget } from 'aio-chat-wc';
 
    initChatWidget({
      user_id: 123,
@@ -64,7 +63,7 @@ For more details, refer to the [Web Component Documentation](./docs/web-componen
 
 ## Service
 
-The Vue-Chat service provides the backend functionality required for chat, including database management, authentication, and chat logic.
+The AIOChatWC service provides the backend functionality required for chat, including database management, authentication, and chat logic.
 
 ### Key Features
 
@@ -77,7 +76,7 @@ The Vue-Chat service provides the backend functionality required for chat, inclu
 1. Create a file to start the service (e.g., `chat_service.js`).
 2. Import and start the service:
    ```javascript
-   import { startService } from 'vue-chat/service';
+   import { startService } from 'aio-chat-wc/service';
 
    startService(config)
      .then(() => console.log("Chat service started successfully."))
@@ -115,7 +114,7 @@ For a full list of configuration options, refer to the [Configuration Documentat
 
 ## Authentication
 
-Vue-Chat supports multiple authentication methods:
+AIOChatWC supports multiple authentication methods:
 
 1. **Direct**: Quick prototyping with minimal setup.
 2. **Auth Endpoint**: Verifies users through a backend endpoint.
@@ -129,7 +128,7 @@ For detailed instructions, refer to the [Authentication Documentation](./docs/se
 
 ## Database
 
-Vue-Chat supports SQLite, MySQL, and PostgreSQL. It includes migration utilities to set up and manage the database schema.
+AIOChatWC supports SQLite, MySQL, and PostgreSQL. It includes migration utilities to set up and manage the database schema.
 
 - **SQLite**: Ideal for quick setups or local development.
 - **MySQL/PostgreSQL**: Recommended for production environments.
@@ -140,7 +139,7 @@ For more details, refer to the [Database Documentation](./docs/service/database.
 
 ## Customization
 
-Vue-Chat is designed to be highly customizable:
+AIOChatWC is designed to be highly customizable:
 
 - **Web Component**: Customize the widget's behavior. In the future change modes and appearance. 
 - **Service**: Override default chat logic, user filtering, authentication and connect it to your existing database. 
@@ -165,7 +164,7 @@ For advanced use cases, refer to the [Chat Service Documentation](./docs/service
 - **CORS Issues**: Configure CORS on both your proxy endpoint and the chat service.
 - **Database Errors**: Verify your database configuration and run migrations.
 
-For more help, check the [GitHub repository](https://github.com/yourusername/vue-chat) or create a new issue.
+For more help, check the [GitHub repository](https://github.com/mamqek/Vue-Chat) or create a new issue.
 
 ---
 

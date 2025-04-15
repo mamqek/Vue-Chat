@@ -1,13 +1,13 @@
 # Basic Setup
 
-The Vue-Chat service provides the backend functionality for the chat component. Follow these steps to set it up:
+The AIOChatWC service provides the backend functionality for the chat component. Follow these steps to set it up:
 
 ## Installation
 
 Install the package:
 
 ```bash
-npm install vue-chat
+npm install aio-chat-wc
 ```
 ## Setup 
 
@@ -15,18 +15,18 @@ First you need to create a file from which you will be stating the service. In t
 
 ### Importing 
 
-In this file you need to import the service part of the package "vue-chat/service"
+In this file you need to import the service part of the package "aio-chat-wc/service"
 
 #### Example for CommonJS
 
 ```javascript
-const { startService } = require('vue-chat/service');
+const { startService } = require('aio-chat-wc/service');
 ```
 
 #### Example for ESM (ECMAScript Modules)
 
 ```javascript
-import { startService } from 'vue-chat/service';
+import { startService } from 'aio-chat-wc/service';
 ```
 
 ### Starting service 

@@ -1,6 +1,6 @@
 # Database Connection
 
-The Vue-Chat service uses a database to store chat-related data. Overall service uses 4 tables: chats, chat_messages, chat_message_statuses, and users. The last one requires additional configuration to be compatible with existing databases. Follow these steps to configure the connection or creation of a new database:
+The AIOChatWC service uses a database to store chat-related data. Overall service uses 4 tables: chats, chat_messages, chat_message_statuses, and users. The last one requires additional configuration to be compatible with existing databases. Follow these steps to configure the connection or creation of a new database:
 
 1. Set appropriate config values to connect to your database or create a new one.
 2. **Read the chapter about [User Entity Customization](#user-entity-customization) before running migrations on an existing database.**

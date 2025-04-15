@@ -1,6 +1,6 @@
 # Chat Service
 
-The Vue-Chat service handles all chat-related logic, including user filtering and message management.
+The AIOChatWC service handles all chat-related logic, including user filtering and message management.
 
 ## Customization
 
@@ -31,7 +31,7 @@ You can see more on how filter should be structured [here](https://orkhan.gitboo
 For more advanced use cases, you also override existing methods or add new ones by extending the `ChatService` class:
 
 ```javascript
-import { ChatService } from 'vue-chat/service';
+import { ChatService } from 'aio-chat-wc/service';
 
 class CustomChatService extends ChatService {
   async getAdvisors(authUserId) {

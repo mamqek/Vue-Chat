@@ -1,6 +1,6 @@
 # Configuration
 
-The Vue-Chat web component supports several configuration options to customize its behavior.
+The AIOChatWC web component supports several configuration options to customize its behavior.
 
 | Option      | Description                                                                 | Default Value           |
 | ----------- | --------------------------------------------------------------------------- | ----------------------- |

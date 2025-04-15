@@ -1,6 +1,6 @@
 # Usage
 
-The Vue-Chat web component can be used in two ways:
+The AIOChatWC web component can be used in two ways:
 
 ## Using the `<chat-widget>` HTML Element
 
@@ -17,7 +17,7 @@ Example:
 Initialize the chat widget programmatically using the `initChatWidget` function:
 
 ```javascript
-import { initChatWidget } from 'vue-chat';
+import { initChatWidget } from 'aio-chat-wc';
 
 initChatWidget({
   user_id: 123,

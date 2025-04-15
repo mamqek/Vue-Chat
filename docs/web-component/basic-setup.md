@@ -1,13 +1,13 @@
 # Basic Setup
 
-The Vue-Chat web component can be quickly set up in your application. Follow these steps to get started:
+The AIOChatWC web component can be quickly set up in your application. Follow these steps to get started:
 
 ## Installation
 
 Install the package via npm:
 
 ```bash
-npm install vue-chat
+npm install aio-chat-wc
 ```
 
 Also, ensure Vue.js is installed in your project:
@@ -31,7 +31,7 @@ Add the following to your HTML:
 Alternatively, initialize the chat widget programmatically:
 
 ```javascript
-import { initChatWidget } from 'vue-chat';
+import { initChatWidget } from 'aio-chat-wc';
 
 initChatWidget({
   user_id: 1,
