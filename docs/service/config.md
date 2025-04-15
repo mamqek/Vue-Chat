@@ -1,6 +1,6 @@
 # Configuration
 
-The Vue-Chat service is highly configurable. Below is a list of configuration variables grouped by their responsibilities:
+The AIOChatWC service is highly configurable. Below is a list of configuration variables grouped by their responsibilities:
 
 | Group                | Variable Name        | Default Value                  | Description                                      |
 |----------------------|----------------------|--------------------------------|--------------------------------------------------|

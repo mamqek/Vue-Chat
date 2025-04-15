@@ -1,6 +1,6 @@
 # Authentication
 
-The Vue-Chat service supports multiple authentication methods to secure chat interactions. Choose the method that best fits your application:
+The AIOChatWC service supports multiple authentication methods to secure chat interactions. Choose the method that best fits your application:
 
 ## Quick Setup (Development)
 
@@ -13,7 +13,7 @@ For quick development setup, simply provide a `user_id` to the chat component:
 Or programmatically:
 
 ```javascript
-import { initChatWidget } from 'vue-chat';
+import { initChatWidget } from 'aio-chat-wc';
 
 initChatWidget({
   container: document.querySelector('#chat-container'),
@@ -296,4 +296,4 @@ module.exports = {
 - Configure CORS on both your proxy endpoint and the chat service
 - Ensure the `SERVICE_URL` configuration points to your proxy endpoint
 
-Need more help? Check the [GitHub repository](https://github.com/yourusername/vue-chat) for issues or to create a new one.
+Need more help? Check the [GitHub repository](https://github.com/mamqek/Vue-Chat) for issues or to create a new one.

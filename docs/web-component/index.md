@@ -1,6 +1,6 @@
 # Web Component Documentation
 
-The Vue-Chat web component allows you to embed a chat widget into your application. This section covers its setup, configuration, and usage.
+The AIOChatWC web component allows you to embed a chat widget into your application. This section covers its setup, configuration, and usage.
 
 ## Introduction
 

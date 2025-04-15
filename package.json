@@ -1,7 +1,18 @@
 {
-    "name": "vue-chat",
-    "version": "0.0.0",
-    "private": true,
+    "name": "aio-chat-wc",
+    "version": "1.0.2",
+    "license": "MIT",
+    "description": "All in one chat web component includes a web component and a backend service for real-time chat.",
+    "keywords": [
+        "chat",
+        "web-component",
+        "vue",
+        "real-time", 
+        "chat-widget", 
+        "aio-chat-wc",
+        "all-in-one-chat-web-component",
+        "aio-chat-widget"
+    ],
     "exports": {
         "./service": {
             "require": "./service/dist/exports.cjs",
@@ -15,6 +26,19 @@
     "bin": {
         "migrations": "./service/dist/migrationUtils.js"
     },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/mamqek/Vue-Chat"
+    },
+    "files": [
+        "src/dist",
+        "service/dist",
+        "service/src/database",
+        "docs",
+        "README.md",
+        "LICENSE",
+        "package.json"
+    ],
     "scripts": {
         "start": "node service/dist/index.js",
         "dev:service": "npx ts-node-dev --project service/tsconfig.json --respawn --transpile-only service/src/index.ts",
