@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"],
+      "@/shadcn-vue-components/*": ["./src/components/ui/shadcn-vue/*"],
+      "@/elements/*": ["./src/components/ui/elements/*"],
+    }
+  },
+  "exclude": ["node_modules", "dist"]
+}

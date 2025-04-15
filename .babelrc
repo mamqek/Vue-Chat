@@ -1,0 +1,4 @@
+// This tells Babel to transpile modern JavaScript (ES6+) into a format compatible with Jest.
+{
+    "presets": ["@babel/preset-env"]
+}

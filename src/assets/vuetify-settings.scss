@@ -1,0 +1,8 @@
+
+// @use 'vuetify' with (
+//     $reset: false   
+// );
+
+@forward 'vuetify/settings' with (
+    $utilities: false,
+);
