@@ -4,27 +4,34 @@ The Vue-Chat service handles all chat-related logic, including user filtering an
 
 ## Customization
 
-You can override the default chat service behavior by providing custom logic. For example, to filter users:
+You can override the default chat service behavior by providing custom logic.
+
+### Users filtering
+
+In the widget there is a button to create new chats, you can change its retrieval logic of users to create chat with like:
 
 ```javascript
-<chat-widget 
-    auth-user='{"id":123,"name":"Alice"}' 
-    advisor-filter='{"customProperty": "value"}'>
-</chat-widget>
+const myConfig = {
+    user_filter : {"customProperty": "value"}
+}
 ```
 
-This filter will be applied to the user repository:
+It will be applied like :
 
 ```javascript
-const otherChatters = await userRepository.find({ where: this.userFilter || {} });
+getOtherChatters() {
+    const otherChatters = await userRepository.find({ where: this.userFilter || {} });
+}
 ```
 
-## Advanced Customization
+You can see more on how filter should be structured [here](https://orkhan.gitbook.io/typeorm/docs/find-options#basic-options)
 
-For more advanced use cases, extend the `ChatService` class:
+### Advanced Customization
+
+For more advanced use cases, you also override existing methods or add new ones by extending the `ChatService` class:
 
 ```javascript
-import { ChatService } from 'vue-chat/src/chatService';
+import { ChatService } from 'vue-chat/service';
 
 class CustomChatService extends ChatService {
   async getAdvisors(authUserId) {
@@ -35,3 +42,13 @@ class CustomChatService extends ChatService {
 
 export default new CustomChatService();
 ```
+
+For that, package exports following fields: 
+
+```javascript
+export { chatServiceInstance, setChatServiceInstance, getChatServiceInstance, ChatService };
+```
+
+where chatServiceInstance is an instance of default service, ChatService is the whole class and getters/setters to replace it 
+
+You will need typescript installed and set you custom ChatService class before starting the service. 

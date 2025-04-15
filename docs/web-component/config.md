@@ -20,3 +20,7 @@ The `user_id` is required for identifying the user. Avoid exposing it directly i
 ### Token
 
 The `token` is used for authentication and should match the configuration in your service backend.
+
+### Container
+
+The `container` specifies the DOM element where the chat widget will be rendered. This is only applicable when using the `initChatWidget` method. If not provided, the widget will not be mounted. Ensure the element exists in the DOM before initializing the widget.

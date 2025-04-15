@@ -4,14 +4,11 @@ The Vue-Chat service provides the backend functionality for the chat component. 
 
 ## Installation
 
-Clone the repository and install dependencies:
+Install the package:
 
 ```bash
-git clone <repository-url>
-cd Vue-Chat
-npm install
+npm install vue-chat
 ```
-
 ## Setup 
 
 First you need to create a file from which you will be stating the service. In this example we will be using chat_service.js 
@@ -23,14 +20,12 @@ In this file you need to import the service part of the package "vue-chat/servic
 #### Example for CommonJS
 
 ```javascript
-// for CommonJS
 const { startService } = require('vue-chat/service');
 ```
 
 #### Example for ESM (ECMAScript Modules)
 
 ```javascript
-// for ESM
 import { startService } from 'vue-chat/service';
 ```
 
